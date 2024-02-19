@@ -1,0 +1,15 @@
+module RawCounter;
+
+import Anoma.Internal.Transaction open;
+import Stdlib.Prelude open;
+
+open Transaction;
+open DeltaComponent;
+
+main (tx : Transaction) : Bool :=
+  length (commitments tx) == 1
+    && length (nullifiers tx) == 1
+    && case delta tx of {
+         | [d] := sign d
+         | _ := false
+       };

@@ -1,0 +1,8 @@
+module Package;
+
+import PackageDescription.V2 open;
+
+package : Package :=
+  defaultPackage
+    {dependencies := [defaultStdlib; path "../"];
+     name := "examples"};
