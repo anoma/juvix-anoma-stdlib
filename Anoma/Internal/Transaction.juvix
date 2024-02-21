@@ -72,3 +72,5 @@ module Resource;
   open Helper.Resource public;
   open Helper using {Resource} public;
 end;
+
+open Resource using {Resource} public;

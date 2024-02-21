@@ -1,15 +1,17 @@
 module Counter;
 
-import Anoma.Transaction open;
+import Anoma open;
 import Stdlib.Prelude open;
 
 open Transaction;
 open Delta;
 
-main (tx : Transaction) : Bool :=
+counter (tx : Transaction) : Bool :=
   length (commitments tx) == 1
     && length (nullifiers tx) == 1
     && case toList (delta tx) of {
          | [_, q] := q >= 0
          | _ := false
        };
+
+main : Internal.Transaction -> Bool := mkLogicFunction counter;
