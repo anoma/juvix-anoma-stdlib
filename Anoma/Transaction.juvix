@@ -1,0 +1,104 @@
+module Anoma.Transaction;
+
+import Stdlib.Prelude open;
+import Data.Map as Map open using {Map};
+
+module Kind;
+
+  module Private;
+    type Kind := mk {id : Nat};
+
+    instance
+    Kind-Eq : Eq Kind :=
+      mkEq@{
+        eq (d1 d2 : Kind) : Bool := Kind.id d1 == Kind.id d2
+      };
+
+    instance
+    Kind-Ord : Ord Kind :=
+      mkOrd@{
+        cmp (d1 d2 : Kind) : Ordering :=
+          Ord.cmp (Kind.id d1) (Kind.id d2)
+      };
+
+  end;
+
+  open Private using {Kind} public;
+
+  syntax alias Eq := Private.Kind-Eq;
+
+end;
+
+open Kind using {Kind} public;
+
+open Kind.Private;
+
+module Delta;
+
+  module Private;
+    type Delta := mk {unDelta : Map Kind Int};
+  end;
+
+  open Private using {Delta} public;
+
+  quantity (d : Kind) (delta : Delta) : Int :=
+    fromMaybe 0 (Map.lookup d (Private.Delta.unDelta delta));
+
+  isBalanced (delta : Delta) : Bool :=
+    all (_, v in toList delta)
+      v == 0;
+
+  toList (delta : Delta) : List (Kind × Int) :=
+    Map.toList (Private.Delta.unDelta delta);
+end;
+
+open Delta using {Delta} public;
+
+-- Proof, Resource, and Transaction are mutually recursive so they must be
+-- defined in the same module.
+module Helper;
+  syntax alias Proof := Resource;
+  syntax alias Commitment := Nat;
+  syntax alias Nullifier := Nat;
+
+  type Resource :=
+    mkResource {
+      logic : Transaction -> Bool;
+      label : List Nat;
+      -- TODO: Use String
+      quantity : Int;
+      data : Nat;
+      eph : Bool;
+      nonce : Nat;
+      npk : Nat;
+      rseed : Nat
+    };
+
+  type Transaction :=
+    mkTransaction {
+      roots : List Nat;
+      commitments : List Commitment;
+      nullifiers : List Nullifier;
+      proofs : List Proof;
+      delta : Delta;
+      extra : Nat;
+      -- TODO: Encoding of the preference function is not specified
+      preference : Nat
+    };
+end;
+
+module Transaction;
+  syntax alias mk := Helper.mkTransaction;
+
+  open Helper.Transaction public;
+  open Helper using {Transaction} public;
+end;
+
+open Transaction using {Transaction} public;
+
+module Resource;
+  syntax alias mk := Helper.mkResource;
+
+  open Helper.Resource public;
+  open Helper using {Resource} public;
+end;
