@@ -39,7 +39,7 @@ module Delta;
     type Delta := mk {unDelta : Map Kind Int};
   end;
 
-  open Private using {Delta} public;
+  open Private using {Delta; mk} public;
 
   quantity (d : Kind) (delta : Delta) : Int :=
     fromMaybe 0 (Map.lookup d (Private.Delta.unDelta delta));
@@ -91,10 +91,10 @@ module Transaction;
   syntax alias mk := Helper.mkTransaction;
 
   open Helper.Transaction public;
-  open Helper using {Transaction} public;
+  open Helper using {Transaction; Commitment; Nullifier} public;
 end;
 
-open Transaction using {Transaction} public;
+open Transaction using {Transaction; Commitment; Nullifier} public;
 
 module Resource;
   syntax alias mk := Helper.mkResource;

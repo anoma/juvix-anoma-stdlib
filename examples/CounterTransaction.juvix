@@ -1,0 +1,52 @@
+module Counter;
+
+import Anoma open;
+import Stdlib.Prelude open;
+import Data.Map as Map open using {Map};
+
+-- Required for Demo only
+import Anoma.Transaction as Demo;
+
+open Transaction;
+open Delta;
+
+counterLogic (tx : Transaction) : Bool :=
+  length (commitments tx) == 1
+    && length (nullifiers tx) == 1
+    && case toList (delta tx) of {
+         | [_, q] := q >= 0
+         | _ := false
+       };
+
+mkCounter (n : Nat) : Resource := Resource.mk@{
+   logic := counterLogic;
+   label := [];
+   quantity := n;
+   data := 0;
+   eph := false;
+   nonce := 0;
+   npk := 0;
+   rseed := 0;
+};
+
+zeroedCounter : Resource := mkCounter 0;
+
+zeroedCounterKind : Kind := Demo.Kind.Private.mk 123;
+
+incrementedCounter : Resource := mkCounter 1;
+
+incrementedCounterCommitment : Commitment := 0;
+
+zeroedCounterNullifier : Nullifier := 0;
+
+counterTransaction : Transaction := Transaction.mk@{
+   roots := [];
+   commitments := [incrementedCounterCommitment];
+   nullifiers := [zeroedCounterNullifier];
+   proofs := [zeroedCounter;incrementedCounter];
+   delta := Delta.mk (Map.fromList [(zeroedCounterKind, 1)]);
+   extra := 0;
+   preference := 0;
+};
+
+main : Internal.Transaction := mkInternalTransaction counterTransaction;

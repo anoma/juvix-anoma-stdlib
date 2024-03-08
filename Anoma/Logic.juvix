@@ -90,4 +90,4 @@ module AuxMutual;
         preference;
 end;
 
-open AuxMutual using {mkLogicFunction} public;
+open AuxMutual using {mkLogicFunction; mkInternalTransaction} public;
