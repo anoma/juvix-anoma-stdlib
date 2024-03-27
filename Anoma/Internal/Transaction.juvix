@@ -32,9 +32,10 @@ module Helper;
   syntax alias Commitment := Nat;
   syntax alias Nullifier := Nat;
 
+  positive
   type Resource :=
     mkResource {
-      logic : Transaction -> Bool;
+      logic : Resource -> Transaction -> Bool;
       label : List Nat;
       quantity : Nat;
       data : Nat;

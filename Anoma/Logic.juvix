@@ -26,7 +26,7 @@ module AuxMutual;
   mkResource : Internal.Resource -> Transaction.Resource
     | (Internal.Resource.mk logic label quantity data eph nonce npk rseed) :=
       Transaction.Resource.mk
-        (logic ∘ mkInternalTransaction)
+        (λ { r t := logic (mkInternalResource r) (mkInternalTransaction t) })
         label
         quantity
         data
@@ -68,7 +68,7 @@ module AuxMutual;
     : Transaction.Resource -> Internal.Resource
     | (Transaction.Resource.mk logic label quantity data eph nonce npk rseed) :=
       Internal.Resource.mk
-        (logic ∘ mkTransaction)
+        (λ { r t := logic (mkResource r) (mkTransaction t) })
         label
         quantity
         data
