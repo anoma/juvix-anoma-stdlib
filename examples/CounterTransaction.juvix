@@ -20,7 +20,7 @@ counterLogic (r : Resource) (tx : Transaction) : Bool :=
 
 mkCounter (n : Nat) : Resource := Resource.mk@{
    logic := counterLogic;
-   label := [];
+   label := 0;
    quantity := n;
    data := 0;
    eph := false;

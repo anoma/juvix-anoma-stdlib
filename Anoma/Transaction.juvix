@@ -65,7 +65,7 @@ module Helper;
   type Resource :=
     mkResource {
       logic : Resource -> Transaction -> Bool;
-      label : List Nat;
+      label : Nat;
       -- TODO: Use String
       quantity : Nat;
       data : Nat;
