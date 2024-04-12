@@ -1,0 +1,28 @@
+--- Functions that are or will be provided by the Anoma system.
+module Anoma.System;
+
+import Stdlib.Prelude open;
+
+syntax alias PublicKey := Nat;
+
+syntax alias Signature := Nat;
+
+--- Get a value by key from Anoma
+builtin anoma-get
+axiom anomaGet : {Value Key : Type} -> Key -> Value;
+
+--- Verifies that data is signed by a public key
+axiom anomaVerify : Nat -> PublicKey -> Bool;
+
+--- Verifies that a signature is valid against some data and a public key
+axiom anomaVerifyDetached : {A : Type}
+  -> Signature
+  -> A
+  -> PublicKey
+  -> Bool;
+
+--- Encode a value
+axiom anomaEncode : {A : Type} -> A -> Nat;
+
+--- Decode a value
+axiom anomaDecode : {A : Type} -> Nat -> A;

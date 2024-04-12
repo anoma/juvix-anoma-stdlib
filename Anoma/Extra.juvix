@@ -1,0 +1,27 @@
+--- Utility functions for the Anoma system
+module Anoma.Extra;
+
+import Anoma.Types open;
+import Stdlib.Prelude open;
+
+--- Resources partitioned into those that the transaction consumes and those
+--- that the transaction creates
+type ResourcePartition :=
+  mkResources {
+    consumed : List Resource;
+    created : List Resource
+  };
+
+--- Partition the ;Resource;s of a ;Transaction; into those that are consumed
+--- and those that are created
+-- TODO: Most logic functions will need to do this to make assertions about
+-- state changes. Why aren't input and output resources already partitioned on
+-- the Resoruce?
+axiom partitionResources : Transaction -> ResourcePartition;
+
+--- The kind of a ;Resource;.
+--- This is some combination of `anomaEncode (Resource.logic r)` and
+--- `anomaEncode (Resource.label r)` defined by Anoma.
+-- TODO: The Anoma implementation needs to be changed before we can use it:
+-- https://github.com/anoma/anoma/blob/1522993620fff4a9a998379a49f3d7a51e7a01d5/lib/anoma/resource.ex#L67
+axiom anomaKind : Resource -> Nat;

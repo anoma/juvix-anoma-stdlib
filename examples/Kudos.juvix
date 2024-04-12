@@ -1,52 +1,17 @@
+--- Scale-Free Kudos
+--- https://research.anoma.net/t/scale-free-kudos-brainstorming-thread/217
 module Kudos;
 
 import Anoma open;
 import Stdlib.Prelude open;
 
-syntax alias PublicKey := Nat;
-syntax alias Signature := Nat;
 syntax alias KudoLabelHash := Nat;
 
--- anomaVerify, anomaEncode, anomaDecode will be provided by Anoma stdlib.
-
--- TODO: anomaVerifyDetached is required in this Kudo implementation but is not
--- planned to be available in the Anoma stdlib.
-
---- Verifies that the given data is signed by the given public key
-axiom anomaVerify : Nat -> PublicKey -> Bool;
-
---- Verifies that the signature is value for the given data and public key
-axiom anomaVerifyDetached : {A : Type}
-  -> Signature
-  -> A
-  -> PublicKey
-  -> Bool;
-
-axiom anomaEncode : {A : Type} -> A -> Nat;
-
-axiom anomaDecode : {A : Type} -> Nat -> A;
-
--- Label is the hash of the PublicKey of the Originator, it needs to be resolved.
+--- Get the ;PublicKey; associated with a ;KudoLabelHash;.
 -- TODO: How does the resolution work?
+-- Does it come from storage?
+-- If so, how is it stored?
 axiom resolveLabel : KudoLabelHash -> PublicKey;
-
-type Resources :=
-  mkResources {
-    input : List Resource;
-    output : List Resource
-  };
-
---- Partition the resources associated to a Transaction into input and output.
--- TODO: Most logic functions will need to do this to make assertions about
--- state changes. Why aren't input and output resources already partitioned on
--- the Resoruce?
-axiom partitionResources : Transaction -> Resources;
-
---- `kind r` is some combination of `anomaEncode (Resource.logic r)` and
---- `anomaEncode (Resource.label r)` defined by Anoma.
--- TODO: The Anoma implementation needs to be changed before we can use it:
--- https://github.com/anoma/anoma/blob/1522993620fff4a9a998379a49f3d7a51e7a01d5/lib/anoma/resource.ex#L67
-axiom anomaKind : Resource -> Nat;
 
 type KudoValue :=
   mkKudoValue {
@@ -91,14 +56,14 @@ checkValidOriginator (r : Resource) : Bool :=
     r
     key;
 
-checkInputResources
+checkConsumedResources
   (r : Resource) (rs : List Resource) : Bool :=
   all (ri in rs)
     not (checkLogic r ri)
       || checkResourceIsKudo ri
       && checkAuthorizedConsumption ri;
 
-checkOutputResources
+checkCreatedResources
   (r : Resource) (rs : List Resource) : Bool :=
   let
     logicHash : Nat := anomaEncode (Resource.logic r);
@@ -113,6 +78,6 @@ checkConnectives (tx : Transaction) : Bool :=
 kudoLogic (r : Resource) (tx : Transaction) : Bool :=
   let
     rs := partitionResources tx;
-  in checkInputResources r (Resources.input rs)
-    && checkOutputResources r (Resources.output rs)
+  in checkConsumedResources r (ResourcePartition.consumed rs)
+    && checkCreatedResources r (ResourcePartition.created rs)
     && checkConnectives tx;

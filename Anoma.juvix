@@ -1,8 +1,5 @@
 module Anoma;
 
-import Anoma.Logic open public;
-import Anoma.Transaction open public;
-
-module Internal;
-  import Anoma.Internal.Transaction open using {Transaction} public;
-end;
+import Anoma.Extra open public;
+import Anoma.System open public;
+import Anoma.Types open public;
