@@ -18,16 +18,17 @@ counterLogic (r : Resource) (tx : Transaction) : Bool :=
          | _ := false
        };
 
-mkCounter (n : Nat) : Resource := Resource.mk@{
-   logic := counterLogic;
-   label := 0;
-   quantity := n;
-   data := 0;
-   eph := false;
-   nonce := 0;
-   npk := 0;
-   rseed := 0;
-};
+mkCounter (n : Nat) : Resource :=
+  Resource.mk@{
+    logic := counterLogic;
+    label := 0;
+    quantity := n;
+    data := 0;
+    eph := false;
+    nonce := 0;
+    npk := 0;
+    rseed := 0
+  };
 
 zeroedCounter : Resource := mkCounter 0;
 
@@ -39,14 +40,16 @@ incrementedCounterCommitment : Commitment := 0;
 
 zeroedCounterNullifier : Nullifier := 0;
 
-counterTransaction : Transaction := Transaction.mk@{
-   roots := [];
-   commitments := [incrementedCounterCommitment];
-   nullifiers := [zeroedCounterNullifier];
-   proofs := [zeroedCounter;incrementedCounter];
-   delta := Delta.mk (Map.fromList [(zeroedCounterKind, 1)]);
-   extra := 0;
-   preference := 0;
-};
+counterTransaction : Transaction :=
+  Transaction.mk@{
+    roots := [];
+    commitments := [incrementedCounterCommitment];
+    nullifiers := [zeroedCounterNullifier];
+    proofs := [zeroedCounter; incrementedCounter];
+    delta := Delta.mk (Map.fromList [zeroedCounterKind, 1]);
+    extra := 0;
+    preference := 0
+  };
 
-main : Internal.Transaction := mkInternalTransaction counterTransaction;
+main : Internal.Transaction :=
+  mkInternalTransaction counterTransaction;
