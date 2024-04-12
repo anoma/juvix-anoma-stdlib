@@ -1,36 +1,68 @@
---- Scale-Free Kudos
---- https://research.anoma.net/t/scale-free-kudos-brainstorming-thread/217
+{-- Scale-Free Kudos
+    https://research.anoma.net/t/scale-free-kudos-brainstorming-thread/217
+
+This module contains the ARMv1 version of the resource logic for kudo,
+    adapted from
+    https://github.com/anoma/kudos-snippets/blob/main/resource_logic.md
+
+Axioms are used for parts that are unclear.
+
+This the purpose of the resource logic, as far as I (paul@heliax.dev)
+    understand.
+
+# Creation of Kudo denomination
+
+Someone, __the originator__ can create a new Kudo denomination. They do this by:
+
+1. generating a public/private key pair.
+
+2. Create a ;Resource; in a Transaction that creates a quantity of this new denomination.
+
+Qs.
+
+  1. How can you populate the ownerSig field? It is generated from the Resource, but is also part of the Resource.
+
+  2. How does a user (say the owner) obtain the kudoLogic in order to participate in the Application?
+
+  3. What is the connectives check?
+
+--}
 module Kudos;
 
 import Anoma open;
 import Stdlib.Prelude open;
 
-syntax alias KudoLabelHash := Nat;
-
---- Get the ;PublicKey; associated with a ;KudoLabelHash;.
--- TODO: How does the resolution work?
--- Does it come from storage?
--- If so, how is it stored?
-axiom resolveLabel : KudoLabelHash -> PublicKey;
-
-type KudoValue :=
-  mkKudoValue {
-    owner : PublicKey;
-    ownerSig : Signature;
-    originatorSig : Signature
-  };
-
-type KudoExtraData := mkKudoExtraData {connectives : Bool};
-
---- Checks that the passed Resources have the same logic function.
-checkLogic (r1 : Resource) (r2 : Resource) : Bool :=
-  anomaEncode (Resource.logic r1)
-    == anomaEncode (Resource.logic r2);
-
---- Check that the value contains a valid signature of the originator.
-checkResourceIsKudo (r : Resource) : Bool :=
+--- Check that the ;Transaction; is valid for the Kudo application.
+--- The self argument is the ;Resource; that defines this logic function.
+kudoLogic (self : Resource) (tx : Transaction) : Bool :=
   let
-    key : PublicKey := resolveLabel (Resource.label r);
+    rs := partitionResources tx;
+    isKudo (r : Resource) : Bool :=
+      anomaEncode (Resource.logic self)
+        == anomaEncode (Resource.logic r);
+    consumedKudo :=
+      filter isKudo (ResourcePartition.consumed rs);
+    createdKudo := filter isKudo (ResourcePartition.created rs);
+  in checkConsumedKudo consumedKudo
+    && checkCreatedKudo createdKudo
+    && checkConnectives tx;
+
+--- Run checks on consumed Kudo ;Resource;s
+checkConsumedKudo (rs : List Resource) : Bool :=
+  all (r in rs)
+    checkValidOriginator r && checkAuthorizedConsumption r;
+
+--- Run checks on created Kudo ;Resource;s
+checkCreatedKudo (rs : List Resource) : Bool :=
+  all (r in rs)
+    checkValidOriginator r;
+
+--- Check that the originator signed the ;Resource; kind.
+checkValidOriginator (r : Resource) : Bool :=
+  let
+    -- TODO: Original design defines the label to be a hash of a public key. Is
+    -- this correct?
+    key : PublicKey := anomaDecode (Resource.label r);
     value : KudoValue := anomaDecode (Resource.data r);
   in anomaVerifyDetached
     {Nat}
@@ -47,37 +79,21 @@ checkAuthorizedConsumption (r : Resource) : Bool :=
     r
     (KudoValue.owner value);
 
-checkValidOriginator (r : Resource) : Bool :=
-  let
-    value : KudoValue := anomaDecode (Resource.data r);
-    key : PublicKey := resolveLabel (Resource.label r);
-  in anomaVerifyDetached
-    (KudoValue.originatorSig value)
-    r
-    key;
+--- The data stored on a Kudo resource
+type KudoValue :=
+  mkKudoValue {
+    owner : PublicKey;
+    ownerSig : Signature;
+    originatorSig : Signature
+  };
 
-checkConsumedResources
-  (r : Resource) (rs : List Resource) : Bool :=
-  all (ri in rs)
-    not (checkLogic r ri)
-      || checkResourceIsKudo ri
-      && checkAuthorizedConsumption ri;
+--- The extra data stored on a Kudo transaction
+type KudoExtraData := mkKudoExtraData {connectives : Bool};
 
-checkCreatedResources
-  (r : Resource) (rs : List Resource) : Bool :=
-  let
-    logicHash : Nat := anomaEncode (Resource.logic r);
-  in all (ro in rs)
-       not (checkLogic r ro) || checkValidOriginator (ro);
-
--- TODO: What is connective validity
+-- TODO: What is connective validity?
 checkConnectives (tx : Transaction) : Bool :=
   KudoExtraData.connectives
-    (anomaDecode (Transaction.extra tx));
-
-kudoLogic (r : Resource) (tx : Transaction) : Bool :=
-  let
-    rs := partitionResources tx;
-  in checkConsumedResources r (ResourcePartition.consumed rs)
-    && checkCreatedResources r (ResourcePartition.created rs)
-    && checkConnectives tx;
+    -- TODO: How do we check that this `anomaDecode` call is valid? i.e this
+      -- transaction is related to Kudo?
+      (anomaDecode
+      (Transaction.extra tx));

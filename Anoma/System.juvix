@@ -14,7 +14,7 @@ axiom anomaGet : {Value Key : Type} -> Key -> Value;
 --- Verifies that data is signed by a public key
 axiom anomaVerify : Nat -> PublicKey -> Bool;
 
---- Verifies that a signature is valid against some data and a public key
+--- Verifies that a signature is valid against for some data and a public key
 axiom anomaVerifyDetached : {A : Type}
   -> Signature
   -> A
