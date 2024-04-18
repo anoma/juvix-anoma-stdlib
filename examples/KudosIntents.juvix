@@ -1,0 +1,14 @@
+--- An example of constructing a kudos exchange intent
+module KudosIntents;
+
+import Kudos.IntentDsl open;
+
+kudoExchange : Transaction :=
+  kudosIntent@{
+    clauses :=
+      [ want (exactly (3 of_ kudoA))
+        for any [3 of_ kudoB; 2 of_ kudoC]
+      ; give (exactly (1 of_ kudoD))
+        for all [2 of_ kudoE; 1 of_ kudoF]
+      ]
+  };

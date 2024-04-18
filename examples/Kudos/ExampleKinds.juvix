@@ -1,0 +1,17 @@
+module Kudos.ExampleKinds;
+
+import Anoma open;
+import Stdlib.Prelude open;
+import Anoma.Transaction as Demo;
+
+kudoA : Kind := Demo.Kind.Private.mk 0;
+
+kudoB : Kind := Demo.Kind.Private.mk 1;
+
+kudoC : Kind := Demo.Kind.Private.mk 2;
+
+kudoD : Kind := Demo.Kind.Private.mk 3;
+
+kudoE : Kind := Demo.Kind.Private.mk 4;
+
+kudoF : Kind := Demo.Kind.Private.mk 5;

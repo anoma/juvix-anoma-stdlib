@@ -20,14 +20,12 @@ Someone, __the originator__ can create a new Kudo denomination. They do this by:
 
 Qs.
 
-  1. How can you populate the ownerSig field? It is generated from the Resource, but is also part of the Resource.
+1. How can you populate the ownerSig field? It is generated from the Resource, but is also part of the Resource.
 
-  2. How does a user (say the owner) obtain the kudoLogic in order to participate in the Application?
+2. How does a user (say the owner) obtain the kudoLogic in order to participate in the Application?
 
-  3. What is the connectives check?
-
---}
-module Kudos;
+3. What is the connectives check? --}
+module Kudos.Logic;
 
 import Anoma open;
 import Stdlib.Prelude open;

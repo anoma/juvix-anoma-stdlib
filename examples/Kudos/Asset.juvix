@@ -1,0 +1,10 @@
+module Kudos.Asset;
+
+import Anoma open;
+import Stdlib.Prelude open;
+
+type Asset :=
+  mkAsset {
+    quantity : Int;
+    kind : Kind
+  };

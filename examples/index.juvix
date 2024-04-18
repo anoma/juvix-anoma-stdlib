@@ -1,4 +1,5 @@
 module index;
 
 import CounterTransaction;
-import Kudos;
+import KudosIntents;
+import Kudos.Logic;
