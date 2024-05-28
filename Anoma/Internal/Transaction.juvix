@@ -36,7 +36,7 @@ module Helper;
   type Resource :=
     mkResource {
       logic : Resource -> Transaction -> Bool;
-      label : Nat;
+      label : String;
       quantity : Nat;
       data : Nat;
       eph : Bool;

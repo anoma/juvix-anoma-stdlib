@@ -11,18 +11,36 @@ syntax alias Signature := Nat;
 builtin anoma-get
 axiom anomaGet : {Value Key : Type} -> Key -> Value;
 
---- Verifies that data is signed by a public key
-axiom anomaVerify : Nat -> PublicKey -> Bool;
-
 --- Verifies that a signature is valid against for some data and a public key
+builtin anoma-verify-detached
 axiom anomaVerifyDetached : {A : Type}
   -> Signature
   -> A
   -> PublicKey
   -> Bool;
 
+builtin anoma-sign
+axiom anomaSign : {A : Type}
+  -- message to sign
+  -> A
+  -- secret key
+  -> Nat
+  -- signed message
+  -> Nat;
+
+builtin anoma-verify
+axiom anomaVerify : {A : Type}
+  -- signed message to verify
+  -> Nat
+  -- public key
+  -> Nat
+  -- message with signature removed
+  -> A;
+
 --- Encode a value
+builtin anoma-encode
 axiom anomaEncode : {A : Type} -> A -> Nat;
 
 --- Decode a value
+builtin anoma-decode
 axiom anomaDecode : {A : Type} -> Nat -> A;
