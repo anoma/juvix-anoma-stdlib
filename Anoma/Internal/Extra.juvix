@@ -12,7 +12,7 @@ anomaKind (r : Resource) : Nat :=
 
 --- The header to use in a nullifier cell
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L36
-nullifierHeader : String := "anullo";
+nullifierHeader : String := "annullo";
 
 --- The nullifier of the given resource.
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L66
