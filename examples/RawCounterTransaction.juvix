@@ -11,10 +11,10 @@ open DeltaComponent;
 import Anoma.Transaction as Demo;
 
 privKey : Nat :=
-  0x3181f891cd2323ffe802dd8f36f7e77cd072e3bd8f49884e8b38a297646351e9015535fa1125ec092c85758756d51bf29eed86a118942135c1657bf4cb5c6fc9;
+  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
 
 pubKey : Nat :=
-  0x3181f891cd2323ffe802dd8f36f7e77cd072e3bd8f49884e8b38a297646351e9;
+  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
 
 counterLogic (r : Resource) (tx : Transaction) : Bool :=
   length (commitments tx) == 1
@@ -48,7 +48,7 @@ counterTransaction : Transaction :=
     proofs := [zeroedCounter; incrementedCounter];
     delta :=
       [ DeltaComponent.mk@{
-        denom := anomaKind zeroedCounter;
+        denom := anomaKind incrementedCounter;
         sign := true;
         amount := 1
       }
