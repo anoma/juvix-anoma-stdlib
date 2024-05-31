@@ -17,7 +17,7 @@ nullifierHeader : String := "annullo";
 --- The nullifier of the given resource.
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L66
 nullifier (r : Resource) (secretKey : Nat) : Nat :=
-  anomaSign (anomaEncode (nullifierHeader, r)) secretKey;
+  anomaSign (nullifierHeader, r) secretKey;
 
 -- The header to use in a commitment cell
 commitmentHeader : String := "committo";
