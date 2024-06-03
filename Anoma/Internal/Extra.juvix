@@ -2,7 +2,7 @@ module Anoma.Internal.Extra;
 
 import Stdlib.Prelude open;
 import Anoma.System open;
-import Anoma.Internal.Transaction open;
+import Anoma.Transaction open;
 
 --- The kind of a ;Resource;.
 --- This is some combination of `anomaEncode (Resource.logic r)` and

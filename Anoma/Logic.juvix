@@ -1,32 +1,27 @@
 module Anoma.Logic;
 
 import Stdlib.Prelude open;
-import Anoma.Internal.Transaction as Internal;
-import Anoma.Transaction as Transaction open using {Transaction; module Transaction};
+import Anoma.Transaction as Transaction open using {Transaction; module Transaction; DeltaComponent; module DeltaComponent; Resource; module Resource};
 import Data.Map as Map;
 
 module AuxMutual;
   mkLogicFunction
     (f : Transaction -> Bool)
-    : Internal.Transaction -> Bool := f ∘ mkTransaction;
+    : Transaction -> Bool := f ∘ mkTransaction;
 
   mkDeltaComponent
-    : Internal.DeltaComponent -> Transaction.Kind × Int
-    | (Internal.DeltaComponent.mk denom sign amount) :=
+    : DeltaComponent -> Transaction.Kind × Int
+    | (DeltaComponent.mk denom sign amount) :=
       let
         k := Transaction.Kind.Private.mk denom;
         quantity := if sign (ofNat amount) (negNat amount);
       in k, quantity;
 
-  mkDelta (d : Internal.Delta) : Transaction.Delta :=
-    Transaction.Delta.Private.mk
-      (Map.fromList (map mkDeltaComponent d));
-
   terminating
-  mkResource : Internal.Resource -> Transaction.Resource
-    | (Internal.Resource.mk logic label quantity data eph nonce npk rseed) :=
+  mkResource : Resource -> Transaction.Resource
+    | (Resource.mk logic label quantity data eph nonce npk rseed) :=
       Transaction.Resource.mk
-        (λ { r t := logic (mkInternalResource r) (mkInternalTransaction t) })
+        (λ { r t := logic (mkInternalResource r) t })
         label
         quantity
         data
@@ -36,38 +31,32 @@ module AuxMutual;
         rseed;
 
   terminating
-  mkTransaction : Internal.Transaction -> Transaction
-    | (Internal.Transaction.mk roots commitments nullifiers proofs delta extra preference) :=
+  mkTransaction : Transaction -> Transaction
+    | (Transaction.mk roots commitments nullifiers proofs delta extra preference) :=
       Transaction.mk
         roots
         commitments
         nullifiers
         (map mkResource proofs)
-        (mkDelta delta)
+        delta
         extra
         preference;
 
   terminating
   mkInternalDeltaComponent
-    : Transaction.Kind × Int -> Internal.DeltaComponent
+    : Transaction.Kind × Int -> DeltaComponent
     | (kind, quantity) :=
-      Internal.DeltaComponent.mk@{
+      DeltaComponent.mk@{
         denom := Transaction.Kind.Private.Kind.id kind;
         sign := quantity >= 0;
         amount := abs quantity
       };
 
   terminating
-  mkInternalDelta (d : Transaction.Delta) : Internal.Delta :=
-    map
-      mkInternalDeltaComponent
-      (Map.toList (Transaction.Delta.Private.Delta.unDelta d));
-
-  terminating
   mkInternalResource
-    : Transaction.Resource -> Internal.Resource
+    : Transaction.Resource -> Resource
     | (Transaction.Resource.mk logic label quantity data eph nonce npk rseed) :=
-      Internal.Resource.mk
+      Resource.mk
         (λ { r t := logic (mkResource r) (mkTransaction t) })
         label
         quantity
@@ -76,18 +65,6 @@ module AuxMutual;
         nonce
         npk
         rseed;
-
-  terminating
-  mkInternalTransaction : Transaction -> Internal.Transaction
-    | (Transaction.mk roots commitments nullifiers proofs delta extra preference) :=
-      Internal.Transaction.mk
-        roots
-        commitments
-        nullifiers
-        (map mkInternalResource proofs)
-        (mkInternalDelta delta)
-        extra
-        preference;
 end;
 
-open AuxMutual using {mkLogicFunction; mkInternalTransaction} public;
+open AuxMutual using {mkLogicFunction} public;
