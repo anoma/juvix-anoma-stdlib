@@ -2,7 +2,3 @@ module Anoma.Types;
 
 import Anoma.Logic open public;
 import Anoma.Transaction open public;
-
-module Internal;
-  import Anoma.Internal.Transaction open using {Transaction} public;
-end;

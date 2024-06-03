@@ -1,7 +1,6 @@
 module Anoma.Transaction;
 
 import Stdlib.Prelude open;
-import Data.Map as Map open using {Map};
 
 module Kind;
 
@@ -33,26 +32,28 @@ open Kind using {Kind} public;
 
 open Kind.Private;
 
-module Delta;
+module DeltaComponent;
 
-  module Private;
-    type Delta := mk {unDelta : Map Kind Int};
-  end;
+  type DeltaComponent :=
+    mk {
+      denom : Nat;
+      sign : Bool;
+      amount : Nat
+    };
 
-  open Private using {Delta; mk} public;
+  zero : DeltaComponent :=
+    mk@{
+      denom := 0;
+      sign := true;
+      amount := 0
+    };
 
-  quantity (d : Kind) (delta : Delta) : Int :=
-    fromMaybe 0 (Map.lookup d (Private.Delta.unDelta delta));
-
-  isBalanced (delta : Delta) : Bool :=
-    all (_, v in toList delta)
-      v == 0;
-
-  toList (delta : Delta) : List (Kind × Int) :=
-    Map.toList (Private.Delta.unDelta delta);
+  open DeltaComponent public;
 end;
 
-open Delta using {Delta} public;
+open DeltaComponent using {DeltaComponent} public;
+
+Delta : Type := List DeltaComponent;
 
 -- Proof, Resource, and Transaction are mutually recursive so they must be
 -- defined in the same module.
@@ -65,6 +66,7 @@ module Helper;
   type Resource :=
     mkResource {
       logic : Resource -> Transaction -> Bool;
+      -- TODO: Should be String
       label : Nat;
       quantity : Nat;
       data : Nat;
@@ -91,10 +93,10 @@ module Transaction;
   syntax alias mk := Helper.mkTransaction;
 
   open Helper.Transaction public;
-  open Helper using {Transaction; Commitment; Nullifier} public;
+  open Helper using {Transaction} public;
 end;
 
-open Transaction using {Transaction; Commitment; Nullifier} public;
+open Transaction using {Transaction} public;
 
 module Resource;
   syntax alias mk := Helper.mkResource;

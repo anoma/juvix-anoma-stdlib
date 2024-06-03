@@ -30,6 +30,39 @@ module Kudos.Logic;
 import Anoma open;
 import Stdlib.Prelude open;
 
+
+--- The extra data stored on a Kudo transaction
+type KudoExtraData := mkKudoExtraData {connectives : Bool};
+
+-- TODO: What is connective validity?
+checkConnectives (tx : Transaction) : Bool :=
+  KudoExtraData.connectives
+    -- TODO: How do we check that this `anomaDecode` call is valid? i.e this
+      -- transaction is related to Kudo?
+      (anomaDecode
+      (Transaction.extra tx));
+
+--- The data stored on a Kudo resource
+type KudoValue :=
+  mkKudoValue {
+    owner : PublicKey;
+    ownerSig : Signature;
+    originatorSig : Signature
+  };
+
+--- Check that the originator signed the ;Resource; kind.
+checkValidOriginator (r : Resource) : Bool :=
+  let
+    -- TODO: Original design defines the label to be a hash of a public key. Is
+    -- this correct?
+    key : PublicKey := anomaDecode (Resource.label r);
+    value : KudoValue := anomaDecode (Resource.data r);
+  in anomaVerifyDetached
+    {Nat}
+    (KudoValue.originatorSig value)
+    (anomaKind r)
+    key;
+
 --- Check that the ;Transaction; is valid for the Kudo application.
 --- The self argument is the ;Resource; that defines this logic function.
 kudoLogic (self : Resource) (tx : Transaction) : Bool :=
@@ -55,19 +88,6 @@ checkCreatedKudo (rs : List Resource) : Bool :=
   all (r in rs)
     checkValidOriginator r;
 
---- Check that the originator signed the ;Resource; kind.
-checkValidOriginator (r : Resource) : Bool :=
-  let
-    -- TODO: Original design defines the label to be a hash of a public key. Is
-    -- this correct?
-    key : PublicKey := anomaDecode (Resource.label r);
-    value : KudoValue := anomaDecode (Resource.data r);
-  in anomaVerifyDetached
-    {Nat}
-    (KudoValue.originatorSig value)
-    (anomaKind r)
-    key;
-
 --- Check that the owner of the Kudo has authorized consumption.
 checkAuthorizedConsumption (r : Resource) : Bool :=
   let
@@ -76,22 +96,3 @@ checkAuthorizedConsumption (r : Resource) : Bool :=
     (KudoValue.ownerSig value)
     r
     (KudoValue.owner value);
-
---- The data stored on a Kudo resource
-type KudoValue :=
-  mkKudoValue {
-    owner : PublicKey;
-    ownerSig : Signature;
-    originatorSig : Signature
-  };
-
---- The extra data stored on a Kudo transaction
-type KudoExtraData := mkKudoExtraData {connectives : Bool};
-
--- TODO: What is connective validity?
-checkConnectives (tx : Transaction) : Bool :=
-  KudoExtraData.connectives
-    -- TODO: How do we check that this `anomaDecode` call is valid? i.e this
-      -- transaction is related to Kudo?
-      (anomaDecode
-      (Transaction.extra tx));

@@ -1,8 +1,8 @@
 module RawCounterTransaction;
 
-import Anoma.Internal.Transaction open;
+import Anoma.Transaction open;
 import Stdlib.Prelude open;
-import Anoma.Internal.Extra open;
+import Anoma.Extra open;
 
 open Transaction;
 open DeltaComponent;
