@@ -6,6 +6,5 @@ package : Package :=
   defaultPackage
     {dependencies := [ defaultStdlib
                      ; path "../"
-                     ; github "anoma" "juvix-containers" "v0.10.0"
                      ];
      name := "examples"};

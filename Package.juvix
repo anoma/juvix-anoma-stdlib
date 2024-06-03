@@ -7,5 +7,4 @@ package : Package :=
     {name := "anoma";
      version := mkVersion 0 1 0;
      dependencies := [ defaultStdlib
-                     ; github "anoma" "juvix-containers" "v0.10.0"
                      ]};
