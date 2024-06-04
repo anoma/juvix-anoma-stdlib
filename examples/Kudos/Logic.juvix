@@ -49,21 +49,25 @@ import Stdlib.Prelude open;
  2. Populate owner field with Apub
  3. Populate quantity field with the number you want to create
  4. Populate other fields as usual
- 5. Populate newOwner field with "no-one identity"
- 6. Generate a signature over this resource using Apriv, populate ownerSig.
- optional 7. Create a transaction with this resource as commitment.
+ -- 5. Populate newOwner field with "no-one identity"
+ -- 6. Generate a signature over this resource using Apriv, populate ownerSig.
+ 7. Create a transaction with this resource as commitment.
 
  # A authorize consumption by B
- 1. set newOwner to Bpub on the "to be consumed resource"
- 2. Generate a signature over this resource using Apriv, populate ownerSig.
+ -- 1. set newOwner to Bpub on the "to be consumed resource"
+ -- 2. Generate a signature over this resource using Apriv, populate ownerSig.
 
  # A transfers n kudos to B
- 1. Consume n kudos that we own, and authorized by A as above.
+ 1. Consume n kudos that we own (concretely, the resource in instantiation)
  2. Create n kudos that are owned by B.
     1. populate owner with Bpub
-    2. Populate other fields as usual
+    -- 2. Generate a signature over this resource using Apriv, populate ownerSig. --
+    3. Populate other fields as usual
  3. Create a transaction with resource in 1. as nullifier and resource in 2.
     as commitment.
+    A sign the list of nullifiers and commitments, populate Transaction.extra field.
+
+
  * The logic function checks that the owner of created is equal to the newOwner of consumed.
    And there is an ownerSig on the consumed one.
 
@@ -76,9 +80,9 @@ import Stdlib.Prelude open;
 type KudoValue :=
   mkKudoValue {
     owner : PublicKey;
-    ownerSig : Signature;
+    -- ownerSig : Signature;
     originatorSig : Signature;
-    nextOwner : PublicKey
+    -- nextOwner : PublicKey
   };
 
 --- Check that the originator signed the ;Resource; kind.
