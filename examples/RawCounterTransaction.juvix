@@ -17,19 +17,18 @@ pubKey : Nat :=
   0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
 
 counterLogic (r : Resource) (tx : Transaction) : Bool :=
-  length (commitments tx) == 1
-    && length (nullifiers tx) == 1
-    && case delta tx of {
-         | [d] := sign d
-         | _ := false
-       };
+  let rs : ResourcePartition := partitionResources tx
+  in
+     case ResourcePartition.consumed rs , ResourcePartition.created rs of
+       | ([old], [new]) := Resource.data new == Resource.data old + 1
+       | _ := false;
 
 mkCounter (n : Nat) : Resource :=
   Resource.mk@{
     logic := counterLogic;
     label := 0;
-    quantity := n;
-    data := 0;
+    quantity := 1;
+    data := n;
     eph := false;
     npk := pubKey;
     nonce := 0;
@@ -46,13 +45,7 @@ counterTransaction : Transaction :=
     commitments := [commitment incrementedCounter];
     nullifiers := [nullifier zeroedCounter privKey];
     proofs := [zeroedCounter; incrementedCounter];
-    delta :=
-      [ DeltaComponent.mk@{
-        denom := anomaKind incrementedCounter;
-        sign := true;
-        amount := 1
-      }
-      ];
+    delta := [];
     extra := 0;
     preference := 0
   };
