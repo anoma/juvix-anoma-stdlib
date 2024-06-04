@@ -1,0 +1,65 @@
+module CountingSystem;
+
+import Anoma.Transaction open;
+import Stdlib.Prelude open;
+import Anoma.Extra open;
+import Anoma.System open;
+
+open Transaction;
+open DeltaComponent;
+
+-- Required for Demo only
+import Anoma.Transaction as Demo;
+
+--- controller private key
+privKey : Nat :=
+  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
+
+--- controller public key
+pubKey : Nat :=
+  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
+
+anomaVerify' {A} (signedData : Nat) (publicKey : Nat) : Bool :=
+  anomaVerify {A} signedData publicKey >>> true;
+
+countingSystemLogic (r : Resource) (tx : Transaction) : Bool :=
+  let
+    rs : ResourcePartition := partitionResources tx;
+    checkSig : Nat := anomaVerify (Transaction.extra tx) pubKey
+  in case
+       ResourcePartition.consumed rs
+         , ResourcePartition.created rs
+     of
+       | [old], [new] :=
+         -- TODO: Check that quantity == 1 for every resource
+         if
+           | Resource.eph old := Resource.data new == 0
+           | else :=
+             Resource.label new == Resource.label old
+               && Resource.data new == Resource.data old + 1
+       | _ := false;
+
+simpleCounterLogic  (r : Resource) (tx : Transaction) : Bool :=
+  let
+    rs : ResourcePartition := partitionResources tx;
+  in case
+       ResourcePartition.consumed rs
+         , ResourcePartition.created rs
+     of
+       -- init case
+       | [dummy; oldCountingSystem], [simpleCounter; newCountingSystem] :=
+         -- TODO: Refactor logic shared with countingSystemLogic
+         Resource.data simpleCounter == 0
+         -- TODO: Check that quantity == 1 for every resource
+         && Resource.label simpleCounter == Resource.data oldCountingSystem
+         && Resource.eph dummy
+         && Resource.label dummy == Resource.data oldCountingSystem
+         && Resource.label newCountingSystem == Resource.label oldCountingSystem
+         && Resource.data newCountingSystem == Resource.data oldCountingSystem + 1
+         -- TODO: do signature check
+        -- update case
+        | [oldSimpleCounter], [newSimpleCounter] :=
+             -- TODO: Check that quantity == 1 for every resource
+             Resource.label newSimpleCounter == Resource.label oldSimpleCounter
+               && Resource.data newSimpleCounter == Resource.data oldSimpleCounter + 1
+        | _ := false;
