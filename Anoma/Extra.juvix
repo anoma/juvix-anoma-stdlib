@@ -15,25 +15,44 @@ type ResourcePartition :=
 
 --- Partition the ;Resource;s of a ;Transaction; into those that are consumed
 --- and those that are created
--- TODO: Most logic functions will need to do this to make assertions about
--- state changes. Why aren't input and output resources already partitioned on
--- the Resoruce?
-axiom partitionResources : Transaction -> ResourcePartition;
+partitionResources (tx : Transaction) : ResourcePartition :=
+  mkResources@{
+    consumed :=
+      map (n in Transaction.nullifiers tx)
+        nullifierResource n;
+    created :=
+      map (c in Transaction.commitments tx)
+        commitmentResource c
+  };
+
+--- Obtain the ;Resource; associated with a commitment
+commitmentResource (commitment : Nat) : Resource :=
+  snd (anomaDecode {Nat × Resource} commitment);
+
+--- Obtain the ;Resource; associated with a nullifier
+nullifierResource (nullifier : Nat) : Resource :=
+  let
+    n1 : Nat × Nat := anomaDecode nullifier;
+    n2 : String × Resource := anomaDecode (fst n1);
+  in snd n2;
 
 --- The kind of a ;Resource;.
 --- This is some combination of `anomaEncode (Resource.logic r)` and
 --- `anomaEncode (Resource.label r)` defined by Anoma.
 anomaKind (r : Resource) : Nat :=
-  anomaEncode (Resource.logic r , Resource.label r);
+  anomaEncode (Resource.logic r, Resource.label r);
 
 --- The header to use in a nullifier cell
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L36
 nullifierHeader : String := "annullo";
 
 --- The nullifier of the given resource.
---- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L66
+--- https://github.com/anoma/anoma/blob/d6a61451ae8fd0f046c083f5ca4a4f38e7ecffb1/lib/anoma/resource.ex#L66
 nullifier (r : Resource) (secretKey : Nat) : Nat :=
-  anomaSign (nullifierHeader, r) secretKey;
+  let
+    n : String × Resource := nullifierHeader, r;
+  in anomaEncode
+    (anomaEncode n, anomaSignDetached n secretKey);
 
 -- The header to use in a commitment cell
 commitmentHeader : String := "committo";

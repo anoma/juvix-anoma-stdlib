@@ -37,6 +37,15 @@ axiom anomaVerify : {A : Type}
   -- message with signature removed
   -> A;
 
+builtin anoma-sign-detached
+axiom anomaSignDetached : {A : Type}
+  -- message to sign
+  -> A
+  -- secret key
+  -> Nat
+  -- signature
+  -> Nat;
+
 --- Encode a value
 builtin anoma-encode
 axiom anomaEncode : {A : Type} -> A -> Nat;
