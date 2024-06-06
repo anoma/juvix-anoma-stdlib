@@ -3,7 +3,6 @@ module Anoma.Transaction;
 import Stdlib.Prelude open;
 
 module Kind;
-
   module Private;
     type Kind := mk {id : Nat};
 

@@ -7,9 +7,6 @@ import Anoma.Extra open;
 open Transaction;
 open DeltaComponent;
 
--- Required for Demo only
-import Anoma.Transaction as Demo;
-
 privKey : Nat :=
   0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
 
@@ -25,9 +22,15 @@ counterLogic (r : Resource) (tx : Transaction) : Bool :=
      of
        | [old], [new] :=
          if
+           -- init counter
+           -- TODO should we check for label/kind?
            | Resource.eph old := Resource.data new == 0
+           -- increment counter
            | else :=
-             Resource.label new == Resource.label old
+             -- TODO should we compare for kind equality instead?
+                   Resource.label
+                   new
+                 == Resource.label old
                && Resource.data new == Resource.data old + 1
        | _ := false;
 
@@ -49,17 +52,6 @@ incrementedCounter : Resource := mkCounter false 1;
 
 dummy : Resource := mkCounter true 666666;
 
-counterTransaction : Transaction :=
-  Transaction.mk@{
-    roots := [];
-    commitments := [commitment incrementedCounter];
-    nullifiers := [nullifier zeroedCounter privKey];
-    proofs := [zeroedCounter; incrementedCounter];
-    delta := [];
-    extra := 0;
-    preference := 0
-  };
-
 mkCounterTransaction
   (consumed : Resource)
   (created : Resource)
@@ -80,4 +72,9 @@ init (resource : Resource) : Transaction :=
 update (old new : Resource) : Transaction :=
   mkCounterTransaction old new;
 
-main : Transaction := init zeroedCounter;
+mainHelper (initCase : Bool) : Transaction :=
+  if
+    | initCase := init zeroedCounter
+    | else := update zeroedCounter incrementedCounter;
+
+main : Transaction := mainHelper true;

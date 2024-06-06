@@ -33,7 +33,7 @@ axiom anomaVerify : {A : Type}
   -- signed message to verify
   -> Nat
   -- public key
-  -> Nat
+  -> PublicKey
   -- message with signature removed
   -> A;
 
