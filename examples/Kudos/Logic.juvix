@@ -58,14 +58,14 @@ import Stdlib.Prelude open;
  -- 2. Generate a signature over this resource using Apriv, populate ownerSig.
 
  # A transfers n kudos to B
- 1. Consume n kudos that we own (concretely, the resource in instantiation)
+ 1. Consume n kudos that we own (concretely, the resource in instantiation) owner is Apub
  2. Create n kudos that are owned by B.
     1. populate owner with Bpub
     -- 2. Generate a signature over this resource using Apriv, populate ownerSig. --
     3. Populate other fields as usual
  3. Create a transaction with resource in 1. as nullifier and resource in 2.
     as commitment.
-    A sign the list of nullifiers and commitments, populate Transaction.extra field.
+    A sign the list of nullifiers and commitments with Apriv, populate Transaction.extra field.
 
 
  * The logic function checks that the owner of created is equal to the newOwner of consumed.
