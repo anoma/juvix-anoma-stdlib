@@ -7,7 +7,6 @@ syntax alias PublicKey := Nat;
 syntax alias PrivateKey := Nat;
 
 syntax alias Signature := Nat;
--- The first part is the original message encoded as a `Nat`, the last part is the 64 bytes long signature.
 syntax alias SignedMessage := Nat;
 
 --- Get a value by key from Anoma.
