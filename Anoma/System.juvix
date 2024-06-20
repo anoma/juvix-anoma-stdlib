@@ -9,52 +9,13 @@ syntax alias PrivateKey := Nat;
 syntax alias Signature := Nat;
 syntax alias SignedMessage := Nat;
 
---- Get a value by key from Anoma.
+--- Retrieves a value by key from Anoma's key-value store.
 builtin anoma-get
-axiom anomaGet : {Value Key : Type} -> Key -> Value;
-
---- Verifies a signature against a provided message and public key.
-builtin anoma-verify-detached
-axiom anomaVerifyDetached : {Message : Type}
-  -- | The signature to verify.
-  -> Signature
-  -- | The message.
-  -> Message
-  -- | The expected public key of the signer.
-  -> PublicKey
-  -- | The verification result.
-  -> Bool;
-
---- Signs a message with a private key and returns a signed message.
-builtin anoma-sign
-axiom anomaSign : {Message : Type}
-  -- | The message to sign.
-  -> Message
-  -- | The signing private key.
-  -> PrivateKey
-  -- | The resulting signed message.
-  -> SignedMessage;
-
---- Verifies a signed message against the public key of the signer and returns the original message.
--- TODO: How does the function behave on mismatch?
-builtin anoma-verify
-axiom anomaVerify : {Message : Type}
-  -- | The signed message to be verified.
-  -> SignedMessage
-  -- | The expected public key of the signer.
-  -> PublicKey
-  -- | The original message.
-  -> Message;
-
---- Signs a message with a private key and returns the signature.
-builtin anoma-sign-detached
-axiom anomaSignDetached : {Message : Type}
-  -- | The message to sign.
-  -> Message
-  -- | The signing private key.
-  -> PrivateKey
-  -- The resulting signature
-  -> Signature;
+axiom anomaGet : {Key Value : Type}
+  -- | The key.
+  -> Key
+  -- | The value.
+  -> Value;
 
 --- Encodes a value into a natural number.
 builtin anoma-encode
@@ -71,3 +32,45 @@ axiom anomaDecode : {Value : Type}
   -> Nat
   -- | The decoded value.
   -> Value;
+
+--- Signs a message with a private key and returns a signed message.
+builtin anoma-sign
+axiom anomaSign : {Message : Type}
+  -- | The message to sign.
+  -> Message
+  -- | The signing private key.
+  -> PrivateKey
+  -- | The resulting signed message.
+  -> SignedMessage;
+
+--- Signs a message with a private key and returns the signature.
+builtin anoma-sign-detached
+axiom anomaSignDetached : {Message : Type}
+  -- | The message to sign.
+  -> Message
+  -- | The signing private key.
+  -> PrivateKey
+  -- The resulting signature
+  -> Signature;
+
+--- Verifies a signed message against the public key of the signer and returns the original message.
+builtin anoma-verify
+axiom anomaVerify : {Message : Type}
+  -- | The signed message to be verified.
+  -> SignedMessage
+  -- | The expected public key of the signer.
+  -> PublicKey
+  -- | The original message.
+  -> Message;
+
+--- Verifies a signature against a provided message and public key.
+builtin anoma-verify-detached
+axiom anomaVerifyDetached : {Message : Type}
+  -- | The signature to verify.
+  -> Signature
+  -- | The message.
+  -> Message
+  -- | The expected public key of the signer.
+  -> PublicKey
+  -- | The verification result.
+  -> Bool;
