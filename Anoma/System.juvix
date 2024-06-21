@@ -53,24 +53,24 @@ axiom anomaSignDetached : {Message : Type}
   -- The resulting signature
   -> Signature;
 
---- Verifies a signed message against the public key of the signer and returns the original message.
+--- Verifies a signed message against a public key and returns the original message.
 builtin anoma-verify
 axiom anomaVerify : {Message : Type}
-  -- | The signed message to be verified.
+  -- | The signed message to verify.
   -> SignedMessage
-  -- | The expected public key of the signer.
+  -- | The signer public key to verify against.
   -> PublicKey
   -- | The original message.
   -> Message;
 
---- Verifies a signature against a provided message and public key.
+--- Verifies a signature against a message and public key.
 builtin anoma-verify-detached
 axiom anomaVerifyDetached : {Message : Type}
   -- | The signature to verify.
   -> Signature
-  -- | The message.
+  -- | The message to verify against.
   -> Message
-  -- | The expected public key of the signer.
+  -- | The signer public key to verify against.
   -> PublicKey
   -- | The verification result.
   -> Bool;
