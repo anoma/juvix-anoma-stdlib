@@ -11,7 +11,7 @@ syntax alias SignedMessage := Nat;
 
 --- Retrieves a value by key from Anoma's key-value store.
 builtin anoma-get
-axiom anomaGet : {Key Value : Type}
+axiom anomaGet : {Value Key: Type}
   -- | The key.
   -> Key
   -- | The value.
