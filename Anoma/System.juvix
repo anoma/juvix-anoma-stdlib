@@ -9,9 +9,16 @@ syntax alias PrivateKey := Nat;
 syntax alias Signature := Nat;
 syntax alias SignedMessage := Nat;
 
+--- A cryptographic keypair
+type KeyPair :=
+  mkKeyPair {
+    pubKey : PublicKey;
+    privKey : PrivateKey;
+  };
+
 --- Retrieves a value by key from Anoma's key-value store.
 builtin anoma-get
-axiom anomaGet : {Value Key: Type}
+axiom anomaGet : {Value Key : Type}
   -- | The key.
   -> Key
   -- | The value.
@@ -57,7 +64,7 @@ axiom anomaSignDetached : {Message : Type}
 builtin anoma-verify
 axiom anomaVerify :
   -- | The signed message to verify.
-  -> SignedMessage
+  SignedMessage
   -- | The signer public key to verify against.
   -> PublicKey
   -- | The verification result.
@@ -75,6 +82,7 @@ axiom anomaVerifyDetached : {Message : Type}
   -- | The verification result.
   -> Bool;
 
+--- Verifies a signature against a message and public key and return the message on success.
 axiom anomaVerifyWithMessage : {Message : Type}
   -- | The signed message to verify.
   -> SignedMessage
