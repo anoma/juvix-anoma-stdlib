@@ -1,0 +1,19 @@
+--- Test assertions for Anoma Transactions
+module TransactionVerifier;
+
+import Anoma.Transaction open;
+import Stdlib.Prelude open;
+import Anoma.Extra open;
+import Test.JuvixUnit open;
+
+open Transaction;
+open DeltaComponent;
+
+assertLogicsValid (tx : Transaction) : Assertion :=
+  assertTrue
+    "Expected all logic functions to return true"
+    (all (r in Transaction.proofs tx)
+      Resource.logic r r tx);
+
+assertTransactionValid : Transaction -> Assertion :=
+  assertLogicsValid;

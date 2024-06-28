@@ -1,0 +1,9 @@
+module Main;
+
+import Stdlib.Prelude open;
+import Test.JuvixUnit open;
+import AlwaysValid.Tests as AlwaysValid;
+
+main : IO :=
+  runTestSuite
+    (testSuite "Juvix Anoma Stdlib tests" AlwaysValid.tests);
