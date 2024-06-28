@@ -1,0 +1,8 @@
+-- | Functions that should be moved to Stdlib.Data.Maybe
+module Anoma.Data.Maybe;
+
+import Stdlib.Prelude open;
+
+isJust {A} : Maybe A -> Bool
+  | (just _) := true
+  | nothing := false;
