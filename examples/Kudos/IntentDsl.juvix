@@ -25,7 +25,7 @@ type Intention :=
 
 type Clause :=
   mkClause {
-    lhs : Intention × QuantifiedAssets;
+    lhs : Pair Intention QuantifiedAssets;
     rhs : QuantifiedAssets
   };
 
@@ -48,17 +48,17 @@ exactly (a : Asset) : QuantifiedAssets :=
   };
 
 want
-  (a : QuantifiedAssets) : Intention × QuantifiedAssets :=
+  (a : QuantifiedAssets) : Pair Intention QuantifiedAssets :=
   Want, a;
 
 give
-  (a : QuantifiedAssets) : Intention × QuantifiedAssets :=
+  (a : QuantifiedAssets) : Pair Intention QuantifiedAssets :=
   Give, a;
 
 syntax operator for pair;
 
 for
-  (l : Intention × QuantifiedAssets)
+  (l : Pair Intention QuantifiedAssets)
   (qs : QuantifiedAssets)
   : Clause :=
   mkClause@{

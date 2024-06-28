@@ -27,13 +27,13 @@ partitionResources (tx : Transaction) : ResourcePartition :=
 
 --- Obtain the ;Resource; associated with a commitment
 commitmentResource (commitment : Nat) : Resource :=
-  snd (anomaDecode {Nat × Resource} commitment);
+  snd (anomaDecode {Pair Nat Resource} commitment);
 
 --- Obtain the ;Resource; associated with a nullifier
 nullifierResource (nullifier : Nat) : Resource :=
   let
-    n1 : Nat × Nat := anomaDecode nullifier;
-    n2 : String × Resource := anomaDecode (fst n1);
+    n1 : Pair Nat Nat := anomaDecode nullifier;
+    n2 : Pair String Resource := anomaDecode (fst n1);
   in snd n2;
 
 --- The kind of a ;Resource;.
@@ -50,7 +50,7 @@ nullifierHeader : String := "annullo";
 --- https://github.com/anoma/anoma/blob/d6a61451ae8fd0f046c083f5ca4a4f38e7ecffb1/lib/anoma/resource.ex#L66
 nullifier (r : Resource) (secretKey : Nat) : Nat :=
   let
-    n : String × Resource := nullifierHeader, r;
+    n : Pair String Resource := nullifierHeader, r;
   in anomaEncode
     (anomaEncode n, anomaSignDetached n secretKey);
 
