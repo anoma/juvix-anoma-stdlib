@@ -3,7 +3,10 @@ module Main;
 import Stdlib.Prelude open;
 import Test.JuvixUnit open;
 import AlwaysValid.Tests as AlwaysValid;
+import Resource.Tests as Resource;
 
 main : IO :=
   runTestSuite
-    (testSuite "Juvix Anoma Stdlib tests" AlwaysValid.tests);
+    (testSuite
+      "Juvix Anoma Stdlib tests"
+      (AlwaysValid.tests ++ Resource.tests));
