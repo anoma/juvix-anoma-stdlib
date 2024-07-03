@@ -85,6 +85,7 @@ axiom anomaVerifyDetached : {Message : Type}
   -> Bool;
 
 --- Verifies a signature against a message and public key and return the message on success.
+builtin anoma-verify-with-message
 axiom anomaVerifyWithMessage : {Message : Type}
   -- | The signed message to verify.
   -> SignedMessage
