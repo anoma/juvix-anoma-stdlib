@@ -105,3 +105,41 @@ module Resource;
 end;
 
 open Resource using {Resource} public;
+
+module Traits;
+
+  import Anoma.System open using {anomaEncode};
+  import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
+
+  open Resource;
+
+  instance
+  ResourceOrd : Ord Resource :=
+    let
+      prod
+        (r : Resource)
+        : Pair
+          Nat
+          (Pair
+            Nat
+            (Pair
+              Nat
+              (Pair Nat (Pair Bool (Pair Nat (Pair Nat Nat)))))) :=
+        anomaEncode (logic r)
+          , label r
+          , quantity r
+          , data r
+          , eph r
+          , nonce r
+          , npk r
+          , rseed r;
+    in mkOrd@{
+      cmp (r1 r2 : Resource) : Ordering :=
+        Ord.cmp (prod r1) (prod r2)
+    };
+
+   instance
+   ResourceEq : Eq Resource := fromOrdToEq;
+end;
+
+open Traits using {ResourceOrd; ResourceEq} public;

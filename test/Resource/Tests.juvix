@@ -1,0 +1,26 @@
+module Resource.Tests;
+
+import Stdlib.Prelude open;
+import Test.JuvixUnit open;
+import Anoma open;
+
+testResource : Resource :=
+  Resource.mk@{
+    logic (r : Resource) (tx : Transaction) : Bool := true;
+    label := 0;
+    quantity := 0;
+    data := 0;
+    eph := true;
+    nonce := 0;
+    npk := 0;
+    rseed := 0
+  };
+
+tests : List Test :=
+  [ testCase
+      "Resources with different logic functions are not equal"
+    <| let
+         r1 := testResource@Resource{logic := \ {_ _ := true}};
+         r2 := testResource@Resource{logic := \ {_ _ := false}};
+       in assertTrue "Expected resources to differ" (r1 /= r2)
+  ];
