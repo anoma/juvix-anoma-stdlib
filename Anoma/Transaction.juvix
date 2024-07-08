@@ -117,14 +117,7 @@ module Traits;
   ResourceOrd : Ord Resource :=
     let
       prod
-        (r : Resource)
-        : Pair
-          Nat
-          (Pair
-            Nat
-            (Pair
-              Nat
-              (Pair Nat (Pair Bool (Pair Nat (Pair Nat Nat)))))) :=
+        (r : Resource) : _ :=
         anomaEncode (logic r)
           , label r
           , quantity r
