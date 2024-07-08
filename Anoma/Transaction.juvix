@@ -60,6 +60,7 @@ module Helper;
   syntax alias Proof := Resource;
   syntax alias Commitment := Nat;
   syntax alias Nullifier := Nat;
+  ComplianceProof : Type := Pair Nat Nat;
 
   positive
   type Resource :=
@@ -81,6 +82,7 @@ module Helper;
       commitments : List Commitment;
       nullifiers : List Nullifier;
       proofs : List Proof;
+      complianceProofs : List ComplianceProof;
       delta : Delta;
       extra : Nat;
       -- TODO: Encoding of the preference function is not specified
@@ -117,14 +119,7 @@ module Traits;
   ResourceOrd : Ord Resource :=
     let
       prod
-        (r : Resource)
-        : Pair
-          Nat
-          (Pair
-            Nat
-            (Pair
-              Nat
-              (Pair Nat (Pair Bool (Pair Nat (Pair Nat Nat)))))) :=
+        (r : Resource) : _ :=
         anomaEncode (logic r)
           , label r
           , quantity r
