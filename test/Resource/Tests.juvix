@@ -12,7 +12,7 @@ testResource : Resource :=
     data := 0;
     eph := true;
     nonce := 0;
-    npk := 0;
+    npk := PublicKey.mk 0;
     rseed := 0
   };
 

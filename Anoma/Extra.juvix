@@ -2,6 +2,7 @@
 module Anoma.Extra;
 
 import Anoma.Types open;
+import Anoma.Transaction open;
 import Stdlib.Prelude open;
 import Anoma.System open;
 
@@ -22,11 +23,12 @@ partitionResources (tx : Transaction) : ResourcePartition :=
   };
 
 --- Obtain the ;Resource; associated with a commitment
-commitmentResource (commitment : Nat) : Resource :=
-  snd (anomaDecode {Pair Nat Resource} commitment);
+commitmentResource : Commitment -> Resource
+  | (Commitment.mk commitment) := snd (anomaDecode {Pair Nat Resource} commitment);
 
 --- Obtain the ;Resource; associated with a nullifier
-nullifierResource (nullifier : Nat) : Resource :=
+nullifierResource : Nullifier -> Resource
+  | (Nullifier.mk nullifier) :=
   let
     n1 : Pair Nat Nat := anomaDecode nullifier;
     n2 : Pair String Resource := anomaDecode (fst n1);
@@ -35,7 +37,8 @@ nullifierResource (nullifier : Nat) : Resource :=
 --- The kind of a ;Resource;.
 --- This is some combination of `anomaEncode (Resource.logic r)` and
 --- `anomaEncode (Resource.label r)` defined by Anoma.
-anomaKind (r : Resource) : Nat := anomaEncode (Resource.logic r, Resource.label r);
+anomaKind (r : Resource) : Kind :=
+  anomaEncode (Resource.logic r, Resource.label r) |> Kind.mk;
 
 --- The header to use in a nullifier cell
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L36
@@ -43,14 +46,16 @@ nullifierHeader : String := "annullo";
 
 --- The nullifier of the given resource.
 --- https://github.com/anoma/anoma/blob/d6a61451ae8fd0f046c083f5ca4a4f38e7ecffb1/lib/anoma/resource.ex#L66
-nullifier (r : Resource) (secretKey : Nat) : Nat :=
+nullifier (r : Resource) (privateKey : PrivateKey) : Nullifier :=
   let
     n : Pair String Resource := nullifierHeader, r;
-  in anomaEncode (anomaEncode n, anomaSignDetached n secretKey);
+  in anomaEncode
+    (anomaEncode n, anomaSignDetached n privateKey) |> Nullifier.mk;
 
 -- The header to use in a commitment cell
 commitmentHeader : String := "committo";
 
 --- A commitment to the given resource
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L55
-commitment (r : Resource) : Nat := anomaEncode (commitmentHeader, r);
+commitment (r : Resource) : Commitment :=
+  anomaEncode (commitmentHeader, r) |> Commitment.mk;
