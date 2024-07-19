@@ -6,8 +6,7 @@ import Test.JuvixUnit open;
 import TransactionVerifier open;
 
 tests : List Test :=
-  [ testCase
-      "Balanced transaction where all logics return true is valid"
+  [ testCase "Balanced transaction where all logics return true is valid"
     <| let
          r := AlwaysValid.mkResource 1;
          tx := AlwaysValid.mkTransaction r r;

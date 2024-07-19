@@ -3,9 +3,8 @@ module Package;
 import PackageDescription.V2 open;
 
 package : Package :=
-  defaultPackage
-    {name := "juvix-anoma-stdlib-test";
-     dependencies := [ github "anoma" "juvix-stdlib" "v0.4.0"
-                     ; path "../"
-                     ; github "anoma" "juvix-test" "v0.11.0"
-                     ]};
+  defaultPackage@?{
+    name := "juvix-anoma-stdlib-test";
+    dependencies :=
+      [github "anoma" "juvix-stdlib" "v0.5.0"; path "../"; github "anoma" "juvix-test" "v0.12.0"]
+  };
