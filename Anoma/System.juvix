@@ -14,7 +14,7 @@ syntax alias SignedMessage := Nat;
 type KeyPair :=
   mkKeyPair {
     pubKey : PublicKey;
-    privKey : PrivateKey;
+    privKey : PrivateKey
   };
 
 --- Retrieves a value by key from Anoma's key-value store.
@@ -64,11 +64,11 @@ axiom anomaSignDetached : {Message : Type}
 --- Verifies a signed message against a public key.
 ---
 --- Arguments:
----   signedMessage : The signed message to verify.
----   publicKey : The signer public key to verify against.
+--- signedMessage : The signed message to verify.
+--- publicKey : The signer public key to verify against.
 ---
 --- Returns:
----   ;true; if the signedMessage was verified.
+--- ;true; if the signedMessage was verified.
 anomaVerify (signedMessage : SignedMessage) (publicKey : PublicKey) : Bool :=
   anomaVerifyWithMessage signedMessage publicKey |> isJust {Unit};
 

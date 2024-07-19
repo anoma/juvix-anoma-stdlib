@@ -6,7 +6,4 @@ import AlwaysValid.Tests as AlwaysValid;
 import Resource.Tests as Resource;
 
 main : IO :=
-  runTestSuite
-    (testSuite
-      "Juvix Anoma Stdlib tests"
-      (AlwaysValid.tests ++ Resource.tests));
+  runTestSuite (testSuite "Juvix Anoma Stdlib tests" (AlwaysValid.tests ++ Resource.tests));

@@ -17,8 +17,7 @@ testResource : Resource :=
   };
 
 tests : List Test :=
-  [ testCase
-      "Resources with different logic functions are not equal"
+  [ testCase "Resources with different logic functions are not equal"
     <| let
          r1 := testResource@Resource{logic := \ {_ _ := true}};
          r2 := testResource@Resource{logic := \ {_ _ := false}};

@@ -17,12 +17,8 @@ type ResourcePartition :=
 --- and those that are created
 partitionResources (tx : Transaction) : ResourcePartition :=
   mkResources@{
-    consumed :=
-      map (n in Transaction.nullifiers tx)
-        nullifierResource n;
-    created :=
-      map (c in Transaction.commitments tx)
-        commitmentResource c
+    consumed := map (n in Transaction.nullifiers tx) nullifierResource n;
+    created := map (c in Transaction.commitments tx) commitmentResource c
   };
 
 --- Obtain the ;Resource; associated with a commitment
@@ -39,8 +35,7 @@ nullifierResource (nullifier : Nat) : Resource :=
 --- The kind of a ;Resource;.
 --- This is some combination of `anomaEncode (Resource.logic r)` and
 --- `anomaEncode (Resource.label r)` defined by Anoma.
-anomaKind (r : Resource) : Nat :=
-  anomaEncode (Resource.logic r, Resource.label r);
+anomaKind (r : Resource) : Nat := anomaEncode (Resource.logic r, Resource.label r);
 
 --- The header to use in a nullifier cell
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L36
@@ -51,13 +46,11 @@ nullifierHeader : String := "annullo";
 nullifier (r : Resource) (secretKey : Nat) : Nat :=
   let
     n : Pair String Resource := nullifierHeader, r;
-  in anomaEncode
-    (anomaEncode n, anomaSignDetached n secretKey);
+  in anomaEncode (anomaEncode n, anomaSignDetached n secretKey);
 
 -- The header to use in a commitment cell
 commitmentHeader : String := "committo";
 
 --- A commitment to the given resource
 --- https://github.com/anoma/anoma/blob/ea25f88cea52226d77c8392ae16bbfc5a7ffccee/lib/anoma/resource.ex#L55
-commitment (r : Resource) : Nat :=
-  anomaEncode (commitmentHeader, r);
+commitment (r : Resource) : Nat := anomaEncode (commitmentHeader, r);

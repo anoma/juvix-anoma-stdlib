@@ -10,11 +10,9 @@ open DeltaComponent;
 privKey : Nat :=
   0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
 
-pubKey : Nat :=
-  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
+pubKey : Nat := 0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
 
-alwaysTrueLogic (r : Resource) (tx : Transaction) : Bool :=
-  true;
+alwaysTrueLogic (r : Resource) (tx : Transaction) : Bool := true;
 
 mkResource (n : Nat) : Resource :=
   Resource.mk@{
@@ -28,10 +26,7 @@ mkResource (n : Nat) : Resource :=
     rseed := 0
   };
 
-mkTransaction
-  (consumed : Resource)
-  (created : Resource)
-  : Transaction :=
+mkTransaction (consumed : Resource) (created : Resource) : Transaction :=
   Transaction.mk@{
     roots := [];
     commitments := [commitment created];

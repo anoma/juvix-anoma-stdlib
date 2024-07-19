@@ -15,8 +15,7 @@ module Kind;
     instance
     Kind-Ord : Ord Kind :=
       mkOrd@{
-        cmp (d1 d2 : Kind) : Ordering :=
-          Ord.cmp (Kind.id d1) (Kind.id d2)
+        cmp (d1 d2 : Kind) : Ordering := Ord.cmp (Kind.id d1) (Kind.id d2)
       };
 
   end;
@@ -60,6 +59,7 @@ module Helper;
   syntax alias Proof := Resource;
   syntax alias Commitment := Nat;
   syntax alias Nullifier := Nat;
+
   ComplianceProof : Type := Pair Nat Nat;
 
   positive
@@ -118,23 +118,14 @@ module Traits;
   instance
   ResourceOrd : Ord Resource :=
     let
-      prod
-        (r : Resource) : _ :=
-        anomaEncode (logic r)
-          , label r
-          , quantity r
-          , data r
-          , eph r
-          , nonce r
-          , npk r
-          , rseed r;
+      prod (r : Resource) : _ :=
+        anomaEncode (logic r), label r, quantity r, data r, eph r, nonce r, npk r, rseed r;
     in mkOrd@{
-      cmp (r1 r2 : Resource) : Ordering :=
-        Ord.cmp (prod r1) (prod r2)
+      cmp (r1 r2 : Resource) : Ordering := Ord.cmp (prod r1) (prod r2)
     };
 
-   instance
-   ResourceEq : Eq Resource := fromOrdToEq;
+  instance
+  ResourceEq : Eq Resource := fromOrdToEq;
 end;
 
 open Traits using {ResourceOrd; ResourceEq} public;

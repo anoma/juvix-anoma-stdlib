@@ -15,5 +15,4 @@ assertLogicsValid (tx : Transaction) : Assertion :=
     (all (r in Transaction.proofs tx)
       Resource.logic r r tx);
 
-assertTransactionValid : Transaction -> Assertion :=
-  assertLogicsValid;
+assertTransactionValid : Transaction -> Assertion := assertLogicsValid;
