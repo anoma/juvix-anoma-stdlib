@@ -8,7 +8,8 @@ open Transaction;
 open DeltaComponent;
 
 privKey : PrivateKey :=
-  PrivateKey.mk 0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
+  PrivateKey.mk
+    0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
 
 pubKey : PublicKey :=
   PublicKey.mk 0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;

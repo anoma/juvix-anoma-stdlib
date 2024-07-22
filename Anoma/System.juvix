@@ -10,24 +10,26 @@ open Builtin using {anomaGet; anomaEncode; anomaDecode} public;
 
 --- Signs a message with a private key and returns a signed message.
 {-# inline: true #-}
-anomaSign : {Message : Type}
-  -- | The message to sign.
-  -> Message
-  -- | The signing private key.
-  -> PrivateKey
-  -- | The resulting signed message.
-  -> SignedMessage
+anomaSign
+  : {Message : Type}
+    -- | The message to sign.
+    -> Message
+    -- | The signing private key.
+    -> PrivateKey
+    -- | The resulting signed message.
+    -> SignedMessage
   | message (PrivateKey.mk privKey) := Builtin.anomaSign message privKey |> SignedMessage.mk;
 
 --- Signs a message with a private key and returns the signature.
 {-# inline: true #-}
-anomaSignDetached : {Message : Type}
-  -- | The message to sign.
-  -> Message
-  -- | The signing private key.
-  -> PrivateKey
-  -- The resulting signature
-  -> Signature
+anomaSignDetached
+  : {Message : Type}
+    -- | The message to sign.
+    -> Message
+    -- | The signing private key.
+    -> PrivateKey
+    -- The resulting signature
+    -> Signature
   | message (PrivateKey.mk privKey) := Builtin.anomaSignDetached message privKey |> Signature.mk;
 
 --- Verifies a signed message against a public key.
@@ -37,31 +39,35 @@ anomaSignDetached : {Message : Type}
 --- publicKey : The signer public key to verify against.
 ---
 --- Returns:
----   ;true; if the signedMessage was verified.
+--- ;true; if the signedMessage was verified.
 {-# inline: true #-}
 anomaVerify (signedMessage : SignedMessage) (publicKey : PublicKey) : Bool :=
   anomaVerifyWithMessage signedMessage publicKey |> isJust {Unit};
 
 --- Verifies a signature against a message and public key.
 {-# inline: true #-}
-anomaVerifyDetached : {Message : Type}
-  -- | The signature to verify.
-  -> Signature
-  -- | The message to verify against.
-  -> Message
-  -- | The signer public key to verify against.
-  -> PublicKey
-  -- | The verification result.
-  -> Bool
-  | (Signature.mk signature) message (PublicKey.mk pubKey) := Builtin.anomaVerifyDetached signature message pubKey;
+anomaVerifyDetached
+  : {Message : Type}
+    -- | The signature to verify.
+    -> Signature
+    -- | The message to verify against.
+    -> Message
+    -- | The signer public key to verify against.
+    -> PublicKey
+    -- | The verification result.
+    -> Bool
+  | (Signature.mk signature) message (PublicKey.mk pubKey) :=
+    Builtin.anomaVerifyDetached signature message pubKey;
 
 --- Verifies a signature against a message and public key and return the message on success.
 {-# inline: true #-}
-anomaVerifyWithMessage : {Message : Type}
-  -- | The signed message to verify.
-  -> SignedMessage
-  -- | The signer public key to verify against.
-  -> PublicKey
-  -- | The original message.
-  -> Maybe Message
-  | (SignedMessage.mk signedMessage) (PublicKey.mk pubKey) := Builtin.anomaVerifyWithMessage signedMessage pubKey;
+anomaVerifyWithMessage
+  : {Message : Type}
+    -- | The signed message to verify.
+    -> SignedMessage
+    -- | The signer public key to verify against.
+    -> PublicKey
+    -- | The original message.
+    -> Maybe Message
+  | (SignedMessage.mk signedMessage) (PublicKey.mk pubKey) :=
+    Builtin.anomaVerifyWithMessage signedMessage pubKey;

@@ -30,6 +30,7 @@ Delta : Type := List DeltaComponent;
 -- defined in the same module.
 module Helper;
   syntax alias Proof := Resource;
+
   ComplianceProof : Type := Pair Nat Nat;
 
   positive
