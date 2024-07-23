@@ -1,0 +1,17 @@
+--- An example of a Juvix module that can be used with the Anoma Node key-value
+--- backend.
+module KeyValue;
+
+import Stdlib.Prelude open;
+import Anoma.System open using {anomaGet};
+import Anoma.KeyValue open;
+
+--- A function that increments the value at a specific key in Anoma Node
+--- Storage.
+main : Assignment Nat :=
+  let
+    key :=
+      mkKey@{
+        path := ["August"; "Water"; "Miki"]
+      };
+  in assign key (anomaGet key + 1);

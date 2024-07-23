@@ -4,3 +4,4 @@ import Anoma.Extra open public;
 import Anoma.System open public;
 import Anoma.Transaction open public;
 import Anoma.Types open public;
+import Anoma.KeyValue as KeyValue public;
