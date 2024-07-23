@@ -1,0 +1,16 @@
+--- This module contains types for use with the Anoma Node key-value backend
+module Anoma.KeyValue;
+
+import Stdlib.Prelude open;
+
+--- A ;Key; represents a key in Anoma storage.
+type Key := mkKey {path : List String};
+
+--- An ;Assignment; represents an assignment of a key to a value in Anoma Node
+--- Storage. This should be used as the type of `main` when compiling a Juvix
+--- module for submission to the Anoma Node key-value backend.
+type Assignment A :=
+  assign {
+    key : Key;
+    value : A
+  };
