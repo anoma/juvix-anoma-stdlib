@@ -1,0 +1,76 @@
+module Anoma.System.Builtin;
+
+import Anoma.Data.Maybe open;
+import Stdlib.Prelude open;
+
+syntax alias PublicKey := Nat;
+syntax alias PrivateKey := Nat;
+
+syntax alias Signature := Nat;
+syntax alias SignedMessage := Nat;
+
+--- Retrieves a value by key from Anoma's key-value store.
+builtin anoma-get
+axiom anomaGet : {Value Key : Type}
+  -- | The key.
+  -> Key
+  -- | The value.
+  -> Value;
+
+--- Encodes a value into a natural number.
+builtin anoma-encode
+axiom anomaEncode : {Value : Type}
+  -- | The value to encode.
+  -> Value
+  -- | The encoded natural number.
+  -> Nat;
+
+--- Decodes a value from a natural number.
+builtin anoma-decode
+axiom anomaDecode : {Value : Type}
+  -- | The natural number to decode .
+  -> Nat
+  -- | The decoded value.
+  -> Value;
+
+--- Signs a message with a private key and returns a signed message.
+builtin anoma-sign
+axiom anomaSign : {Message : Type}
+  -- | The message to sign.
+  -> Message
+  -- | The signing private key.
+  -> PrivateKey
+  -- | The resulting signed message.
+  -> SignedMessage;
+
+--- Signs a message with a private key and returns the signature.
+builtin anoma-sign-detached
+axiom anomaSignDetached : {Message : Type}
+  -- | The message to sign.
+  -> Message
+  -- | The signing private key.
+  -> PrivateKey
+  -- The resulting signature
+  -> Signature;
+
+--- Verifies a signature against a message and public key.
+builtin anoma-verify-detached
+axiom anomaVerifyDetached : {Message : Type}
+  -- | The signature to verify.
+  -> Signature
+  -- | The message to verify against.
+  -> Message
+  -- | The signer public key to verify against.
+  -> PublicKey
+  -- | The verification result.
+  -> Bool;
+
+--- Verifies a signature against a message and public key and return the message on success.
+builtin anoma-verify-with-message
+axiom anomaVerifyWithMessage : {Message : Type}
+  -- | The signed message to verify.
+  -> SignedMessage
+  -- | The signer public key to verify against.
+  -> PublicKey
+  -- | The original message.
+  -> Maybe Message;

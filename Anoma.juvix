@@ -2,4 +2,5 @@ module Anoma;
 
 import Anoma.Extra open public;
 import Anoma.System open public;
+import Anoma.Transaction open public;
 import Anoma.Types open public;

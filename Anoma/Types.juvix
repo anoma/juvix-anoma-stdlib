@@ -1,3 +1,166 @@
+--- Common types used in the library
 module Anoma.Types;
 
-import Anoma.Transaction open public;
+import Stdlib.Prelude open;
+
+import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
+
+module Nullifier;
+
+  type Nullifier := mk {unNullifier : Nat};
+
+  open Nullifier public;
+end;
+
+open Nullifier using {Nullifier} public;
+
+module Commitment;
+
+  type Commitment := mk {unCommitment : Nat};
+
+  open Commitment public;
+end;
+
+open Commitment using {Commitment} public;
+
+module Kind;
+
+  type Kind := mk {unKind : Nat};
+
+  open Kind public;
+end;
+
+open Kind using {Kind} public;
+
+module PublicKey;
+
+  type PublicKey := mk {unPublicKey : Nat};
+
+  open PublicKey public;
+end;
+
+open PublicKey using {PublicKey} public;
+
+module PrivateKey;
+
+  type PrivateKey := mk {unPrivateKey : Nat};
+
+  open PrivateKey public;
+end;
+
+open PrivateKey using {PrivateKey} public;
+
+module Signature;
+
+  type Signature := mk {unSignature : Nat};
+
+  open Signature public;
+end;
+
+open Signature using {Signature} public;
+
+module SignedMessage;
+
+  type SignedMessage := mk {unSignedMessage : Nat};
+
+  open SignedMessage public;
+end;
+
+open SignedMessage using {SignedMessage} public;
+
+module KeyPair;
+
+  --- A cryptographic keypair
+  type KeyPair :=
+    mk {
+      pubKey : PublicKey;
+      privKey : PrivateKey
+    };
+
+  open KeyPair public;
+
+end;
+
+open KeyPair using {KeyPair} public;
+
+instance
+NullifierOrd : Ord Nullifier :=
+  mkOrd@{
+    cmp : Nullifier -> Nullifier -> Ordering
+      | (Nullifier.mk x1) (Nullifier.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+NullifierEq : Eq Nullifier := fromOrdToEq;
+
+instance
+CommitmentOrd : Ord Commitment :=
+  mkOrd@{
+    cmp : Commitment -> Commitment -> Ordering
+      | (Commitment.mk x1) (Commitment.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+CommitmentEq : Eq Commitment := fromOrdToEq;
+
+instance
+KindOrd : Ord Kind :=
+  mkOrd@{
+    cmp : Kind -> Kind -> Ordering
+      | (Kind.mk x1) (Kind.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+KindEq : Eq Kind := fromOrdToEq;
+
+instance
+PublicKeyOrd : Ord PublicKey :=
+  mkOrd@{
+    cmp : PublicKey -> PublicKey -> Ordering
+      | (PublicKey.mk x1) (PublicKey.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+PublicKeyEq : Eq PublicKey := fromOrdToEq;
+
+instance
+PrivateKeyOrd : Ord PrivateKey :=
+  mkOrd@{
+    cmp : PrivateKey -> PrivateKey -> Ordering
+      | (PrivateKey.mk x1) (PrivateKey.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+PrivateKeyEq : Eq PrivateKey := fromOrdToEq;
+
+instance
+SignatureOrd : Ord Signature :=
+  mkOrd@{
+    cmp : Signature -> Signature -> Ordering
+      | (Signature.mk x1) (Signature.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+SignatureEq : Eq Signature := fromOrdToEq;
+
+instance
+SignedMessageOrd : Ord SignedMessage :=
+  mkOrd@{
+    cmp : SignedMessage -> SignedMessage -> Ordering
+      | (SignedMessage.mk x1) (SignedMessage.mk x2) := Ord.cmp x1 x2
+  };
+
+instance
+SignedMessageEq : Eq SignedMessage := fromOrdToEq;
+
+instance
+KeyPairOrd : Ord KeyPair :=
+  let
+    toProd : KeyPair -> _
+      | (KeyPair.mk x1 x2) := x1, x2;
+  in mkOrd@{
+    cmp (x1 x2 : KeyPair) : Ordering := Ord.cmp (toProd x1) (toProd x2)
+  };
+
+instance
+KeyPairEq : Eq KeyPair := fromOrdToEq;

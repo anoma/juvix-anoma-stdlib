@@ -1,47 +1,20 @@
 module Anoma.Transaction;
 
 import Stdlib.Prelude open;
-
-module Kind;
-  module Private;
-    type Kind := mk {id : Nat};
-
-    instance
-    Kind-Eq : Eq Kind :=
-      mkEq@{
-        eq (d1 d2 : Kind) : Bool := Kind.id d1 == Kind.id d2
-      };
-
-    instance
-    Kind-Ord : Ord Kind :=
-      mkOrd@{
-        cmp (d1 d2 : Kind) : Ordering := Ord.cmp (Kind.id d1) (Kind.id d2)
-      };
-
-  end;
-
-  open Private using {Kind} public;
-
-  syntax alias Eq := Private.Kind-Eq;
-
-end;
-
-open Kind using {Kind} public;
-
-open Kind.Private;
+import Anoma.Types open;
 
 module DeltaComponent;
 
   type DeltaComponent :=
     mk {
-      denom : Nat;
+      denom : Kind;
       sign : Bool;
       amount : Nat
     };
 
   zero : DeltaComponent :=
     mk@{
-      denom := 0;
+      denom := Kind.mk 0;
       sign := true;
       amount := 0
     };
@@ -57,8 +30,6 @@ Delta : Type := List DeltaComponent;
 -- defined in the same module.
 module Helper;
   syntax alias Proof := Resource;
-  syntax alias Commitment := Nat;
-  syntax alias Nullifier := Nat;
 
   ComplianceProof : Type := Pair Nat Nat;
 
@@ -66,13 +37,12 @@ module Helper;
   type Resource :=
     mkResource {
       logic : Resource -> Transaction -> Bool;
-      -- TODO: Should be String
       label : Nat;
       quantity : Nat;
       data : Nat;
       eph : Bool;
       nonce : Nat;
-      npk : Nat;
+      npk : PublicKey;
       rseed : Nat
     };
 
