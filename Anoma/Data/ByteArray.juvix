@@ -1,0 +1,12 @@
+module Anoma.Data.ByteArray;
+
+import Stdlib.Prelude open;
+
+builtin bytearray
+axiom ByteArray : Type;
+
+builtin bytearray-from-list-byte
+axiom mk : List Byte -> ByteArray;
+
+builtin bytearray-length
+axiom length : ByteArray -> Nat;
