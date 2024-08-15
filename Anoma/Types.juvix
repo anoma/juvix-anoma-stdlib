@@ -2,6 +2,9 @@
 module Anoma.Types;
 
 import Stdlib.Prelude open;
+import Anoma.Data.ByteArray open using {ByteArray} public;
+import Anoma.Data.ByteArray as ByteArray public;
+import Anoma.Data.Byte;
 
 import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
 
@@ -34,7 +37,7 @@ open Kind using {Kind} public;
 
 module PublicKey;
 
-  type PublicKey := mk {unPublicKey : Nat};
+  type PublicKey := mk {unPublicKey : List Byte};
 
   open PublicKey public;
 end;
@@ -43,7 +46,7 @@ open PublicKey using {PublicKey} public;
 
 module PrivateKey;
 
-  type PrivateKey := mk {unPrivateKey : Nat};
+  type PrivateKey := mk {unPrivateKey : List Byte};
 
   open PrivateKey public;
 end;
@@ -52,7 +55,7 @@ open PrivateKey using {PrivateKey} public;
 
 module Signature;
 
-  type Signature := mk {unSignature : Nat};
+  type Signature := mk {unSignature : ByteArray};
 
   open Signature public;
 end;
@@ -61,7 +64,7 @@ open Signature using {Signature} public;
 
 module SignedMessage;
 
-  type SignedMessage := mk {unSignedMessage : Nat};
+  type SignedMessage := mk {unSignedMessage : ByteArray};
 
   open SignedMessage public;
 end;
@@ -132,26 +135,6 @@ PrivateKeyOrd : Ord PrivateKey :=
 
 instance
 PrivateKeyEq : Eq PrivateKey := fromOrdToEq;
-
-instance
-SignatureOrd : Ord Signature :=
-  mkOrd@{
-    cmp : Signature -> Signature -> Ordering
-      | (Signature.mk x1) (Signature.mk x2) := Ord.cmp x1 x2
-  };
-
-instance
-SignatureEq : Eq Signature := fromOrdToEq;
-
-instance
-SignedMessageOrd : Ord SignedMessage :=
-  mkOrd@{
-    cmp : SignedMessage -> SignedMessage -> Ordering
-      | (SignedMessage.mk x1) (SignedMessage.mk x2) := Ord.cmp x1 x2
-  };
-
-instance
-SignedMessageEq : Eq SignedMessage := fromOrdToEq;
 
 instance
 KeyPairOrd : Ord KeyPair :=

@@ -1,13 +1,14 @@
 module Anoma.System.Builtin;
 
+import Anoma.Data.ByteArray open;
 import Anoma.Data.Maybe open;
 import Stdlib.Prelude open;
 
-syntax alias PublicKey := Nat;
-syntax alias PrivateKey := Nat;
+syntax alias PublicKey := ByteArray;
+syntax alias PrivateKey := ByteArray;
 
-syntax alias Signature := Nat;
-syntax alias SignedMessage := Nat;
+syntax alias Signature := ByteArray;
+syntax alias SignedMessage := ByteArray;
 
 --- Retrieves a value by key from Anoma's key-value store.
 builtin anoma-get

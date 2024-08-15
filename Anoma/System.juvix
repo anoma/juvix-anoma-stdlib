@@ -18,7 +18,8 @@ anomaSign
     -> PrivateKey
     -- | The resulting signed message.
     -> SignedMessage
-  | message (PrivateKey.mk privKey) := Builtin.anomaSign message privKey |> SignedMessage.mk;
+  | message (PrivateKey.mk privKey) :=
+    Builtin.anomaSign message (ByteArray.mk privKey) |> SignedMessage.mk;
 
 --- Signs a message with a private key and returns the signature.
 {-# inline: true #-}
@@ -30,7 +31,8 @@ anomaSignDetached
     -> PrivateKey
     -- The resulting signature
     -> Signature
-  | message (PrivateKey.mk privKey) := Builtin.anomaSignDetached message privKey |> Signature.mk;
+  | message (PrivateKey.mk privKey) :=
+    Builtin.anomaSignDetached message (ByteArray.mk privKey) |> Signature.mk;
 
 --- Verifies a signed message against a public key.
 ---
@@ -57,7 +59,7 @@ anomaVerifyDetached
     -- | The verification result.
     -> Bool
   | (Signature.mk signature) message (PublicKey.mk pubKey) :=
-    Builtin.anomaVerifyDetached signature message pubKey;
+    Builtin.anomaVerifyDetached signature message (ByteArray.mk pubKey);
 
 --- Verifies a signature against a message and public key and return the message on success.
 {-# inline: true #-}
@@ -70,4 +72,4 @@ anomaVerifyWithMessage
     -- | The original message.
     -> Maybe Message
   | (SignedMessage.mk signedMessage) (PublicKey.mk pubKey) :=
-    Builtin.anomaVerifyWithMessage signedMessage pubKey;
+    Builtin.anomaVerifyWithMessage signedMessage (ByteArray.mk pubKey);

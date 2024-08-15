@@ -1,0 +1,8 @@
+module Anoma.Data.Byte;
+
+import Stdlib.Prelude open;
+import Stdlib.Data.Byte open;
+
+{-# specialize: true, inline: case #-}
+instance
+ordByteI : Ord Byte := mkOrd (Ord.cmp on Byte.toNat);
