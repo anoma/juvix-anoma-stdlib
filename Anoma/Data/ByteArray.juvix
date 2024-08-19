@@ -10,3 +10,11 @@ axiom mk : List Byte -> ByteArray;
 
 builtin bytearray-length
 axiom length : ByteArray -> Nat;
+
+syntax alias AnomaContents := Nat;
+
+builtin anoma-bytearray-to-anoma-contents
+axiom toAnomaContents : ByteArray -> AnomaContents;
+
+builtin anoma-bytearray-from-anoma-contents
+axiom fromAnomaContents : Nat -> AnomaContents -> ByteArray;

@@ -1,0 +1,13 @@
+--- Representations of values when interacting with Anoma
+module Anoma.Rep;
+
+import Stdlib.Prelude open;
+import Anoma.Data.ByteArray open;
+
+trait
+type AnomaAtomConvertable A := mkAnomaAtomConvertable {
+  fromAtom : Nat -> A;
+  toAtom : A -> Nat
+};
+
+open AnomaAtomConvertable public;

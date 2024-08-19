@@ -3,15 +3,10 @@ module RawCounterTransaction;
 import Anoma.Transaction open;
 import Stdlib.Prelude open;
 import Anoma.Extra open;
+import RawCounterTransaction.Keys open;
 
 open Transaction;
 open DeltaComponent;
-
-privKey : Nat :=
-  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
-
-pubKey : Nat :=
-  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
 
 counterLogic (r : Resource) (tx : Transaction) : Bool :=
   let

@@ -2,6 +2,7 @@ module Anoma.Transaction;
 
 import Stdlib.Prelude open;
 import Anoma.Types open;
+import Anoma.Rep open;
 
 module DeltaComponent;
 
@@ -31,8 +32,6 @@ Delta : Type := List DeltaComponent;
 module Helper;
   syntax alias Proof := Resource;
 
-  ComplianceProof : Type := Pair Nat Nat;
-
   positive
   type Resource :=
     mkResource {
@@ -42,7 +41,7 @@ module Helper;
       data : Nat;
       eph : Bool;
       nonce : Nat;
-      npk : PublicKey;
+      npkContents : Nat;
       rseed : Nat
     };
 
@@ -52,7 +51,6 @@ module Helper;
       commitments : List Commitment;
       nullifiers : List Nullifier;
       proofs : List Proof;
-      complianceProofs : List ComplianceProof;
       delta : Delta;
       extra : Nat;
       -- TODO: Encoding of the preference function is not specified
@@ -70,10 +68,30 @@ end;
 open Transaction using {Transaction} public;
 
 module Resource;
-  syntax alias mk := Helper.mkResource;
-
   open Helper.Resource public;
   open Helper using {Resource} public;
+
+  mk
+    (logic : Resource -> Transaction -> Bool)
+    (label : Nat)
+    (quantity : Nat)
+    (data : Nat)
+    (eph : Bool)
+    (nonce : Nat)
+    (npk : PublicKey)
+    (rseed : Nat)
+    : Resource :=
+    Helper.mkResource@{
+      logic;
+      label;
+      quantity;
+      data;
+      eph;
+      nonce;
+      npkContents := toAtom npk;
+      rseed
+    };
+
 end;
 
 open Resource using {Resource} public;
@@ -89,7 +107,7 @@ module Traits;
   ResourceOrd : Ord Resource :=
     let
       prod (r : Resource) : _ :=
-        anomaEncode (logic r), label r, quantity r, data r, eph r, nonce r, npk r, rseed r;
+        anomaEncode (logic r), label r, quantity r, data r, eph r, nonce r, npkContents r, rseed r;
     in mkOrd@{
       cmp (r1 r2 : Resource) : Ordering := Ord.cmp (prod r1) (prod r2)
     };
