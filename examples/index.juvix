@@ -2,4 +2,3 @@ module index;
 
 import RawCounterTransaction;
 import KudosIntents;
-import Kudos.Logic;

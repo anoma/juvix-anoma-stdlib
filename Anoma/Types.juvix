@@ -4,6 +4,7 @@ module Anoma.Types;
 import Stdlib.Prelude open;
 import Anoma.Data.ByteArray open using {ByteArray} public;
 import Anoma.Data.ByteArray as ByteArray public;
+import Anoma.Rep open;
 import Anoma.Data.Byte;
 
 import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
@@ -37,7 +38,9 @@ open Kind using {Kind} public;
 
 module PublicKey;
 
-  type PublicKey := mk {unPublicKey : List Byte};
+  type PublicKey := fromByteArray {toByteArray : ByteArray};
+
+  mk : List Byte -> PublicKey := ByteArray.mk >> fromByteArray;
 
   open PublicKey public;
 end;
@@ -46,7 +49,9 @@ open PublicKey using {PublicKey} public;
 
 module PrivateKey;
 
-  type PrivateKey := mk {unPrivateKey : List Byte};
+  type PrivateKey := fromByteArray {toByteArray : ByteArray};
+
+  mk : List Byte -> PrivateKey := ByteArray.mk >> fromByteArray;
 
   open PrivateKey public;
 end;
@@ -117,10 +122,31 @@ instance
 KindEq : Eq Kind := fromOrdToEq;
 
 instance
+PublicKeyAnomaAtomConvertable : AnomaAtomConvertable PublicKey :=
+  mkAnomaAtomConvertable@{
+    toAtom : PublicKey -> Nat := PublicKey.toByteArray >> ByteArray.toAnomaContents;
+    fromAtom : Nat -> PublicKey := ByteArray.fromAnomaContents 32 >> PublicKey.fromByteArray
+  };
+
+instance
+PrivateKeyAnomaAtomConvertable : AnomaAtomConvertable PrivateKey :=
+  mkAnomaAtomConvertable@{
+    toAtom : PrivateKey -> Nat := PrivateKey.toByteArray >> ByteArray.toAnomaContents;
+    fromAtom : Nat -> PrivateKey := ByteArray.fromAnomaContents 64 >> PrivateKey.fromByteArray
+  };
+
+instance
+SignatureAnomaAtomConvertable : AnomaAtomConvertable Signature :=
+  mkAnomaAtomConvertable@{
+    toAtom : Signature -> Nat
+      | (Signature.mk bs) := ByteArray.toAnomaContents bs;
+    fromAtom : Nat -> Signature := ByteArray.fromAnomaContents 64 >> Signature.mk
+  };
+
+instance
 PublicKeyOrd : Ord PublicKey :=
   mkOrd@{
-    cmp : PublicKey -> PublicKey -> Ordering
-      | (PublicKey.mk x1) (PublicKey.mk x2) := Ord.cmp x1 x2
+    cmp := Ord.cmp on toAtom
   };
 
 instance
@@ -129,8 +155,7 @@ PublicKeyEq : Eq PublicKey := fromOrdToEq;
 instance
 PrivateKeyOrd : Ord PrivateKey :=
   mkOrd@{
-    cmp : PrivateKey -> PrivateKey -> Ordering
-      | (PrivateKey.mk x1) (PrivateKey.mk x2) := Ord.cmp x1 x2
+    cmp := Ord.cmp on toAtom
   };
 
 instance

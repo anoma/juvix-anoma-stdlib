@@ -1,32 +1,20 @@
 module CountingSystem;
 
-import Anoma.Transaction open;
 import Stdlib.Prelude open;
-import Anoma.Extra open;
-import Anoma.System open;
+import Anoma open;
+import CountingSystem.Keys open;
 
 open Transaction;
 open DeltaComponent;
 
---- controller private key
-privKey : Nat :=
-  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac11662fc6e7829efcb0f4500827d49bb699af7b5475cef5220fd600ebbf9709a58;
-
---- controller public key
-pubKey : Nat :=
-  0xddd315c76991f8e058760cacdd19c21bf6a12c72bc229a60ad6aaa314fa07ac1;
-
-anomaVerify' {A} (signedData : Nat) (publicKey : Nat) : Bool :=
-  anomaVerify {A} signedData publicKey >>> true;
-
 type LabelValue := mkLabelValue {
-   controllerPubKey : Nat;
+   controllerPubKey : PublicKey;
 };
 
 countingSystemLogic (self : Resource) (tx : Transaction) : Bool :=
   let
     rs : ResourcePartition := partitionResources tx;
-    checkSig : Nat := anomaVerify (Transaction.extra tx) pubKey;
+    checkSig := anomaVerify (Transaction.extra tx |> anomaDecode {SignedMessage}) pubKey;
     isCountingSystem (r : Resource) : Bool :=
       anomaKind self == anomaKind r;
     -- TODO: Replace with ray's solution
@@ -102,11 +90,11 @@ countingSystemInit (zeroed : Resource) : Transaction :=
   let dummy : Resource := mkCountingSystem true 666;
       unsignedTx : Transaction := mkCountingSystemTransaction dummy zeroed;
       in
-      unsignedTx@Transaction{extra := anomaSign unsignedTx privKey};
+      unsignedTx@Transaction{extra := anomaSign unsignedTx privKey |> anomaEncode};
 
 countingSystemUpdate (old new : Resource) : Transaction :=
   let unsignedTx : Transaction := mkCountingSystemTransaction old new;
       in
-      unsignedTx@Transaction{extra := anomaSign unsignedTx privKey};
+      unsignedTx@Transaction{extra := anomaSign unsignedTx privKey |> anomaEncode};
 
 main : Transaction := countingSystemUpdate (mkCountingSystem false 0) (mkCountingSystem false 0);

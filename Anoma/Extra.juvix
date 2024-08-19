@@ -5,6 +5,7 @@ import Anoma.Types open;
 import Anoma.Transaction open;
 import Stdlib.Prelude open;
 import Anoma.System open;
+import Anoma.Rep as Rep;
 
 --- Resources partitioned into those that the transaction consumes and those
 --- that the transaction creates
@@ -48,7 +49,7 @@ nullifierHeader : String := "annullo";
 nullifier (r : Resource) (privateKey : PrivateKey) : Nullifier :=
   let
     n : Pair String Resource := nullifierHeader, r;
-  in anomaEncode (anomaEncode n, anomaSignDetached n privateKey) |> Nullifier.mk;
+  in anomaEncode (anomaEncode n, Rep.toAtom (anomaSignDetached n privateKey)) |> Nullifier.mk;
 
 -- The header to use in a commitment cell
 commitmentHeader : String := "committo";

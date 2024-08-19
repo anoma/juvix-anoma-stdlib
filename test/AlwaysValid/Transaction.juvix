@@ -29,7 +29,6 @@ mkTransaction (consumed : Resource) (created : Resource) : Transaction :=
     commitments := [commitment created];
     nullifiers := [nullifier consumed privKey];
     proofs := [consumed; created];
-    complianceProofs := [];
     delta := [];
     extra := 0;
     preference := 0
