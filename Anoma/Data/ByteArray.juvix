@@ -1,20 +1,52 @@
 module Anoma.Data.ByteArray;
 
 import Stdlib.Prelude open;
+import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
+import Anoma.Data.Byte;
+import Anoma.Data.ByteArray.Base as ByteArray open using {ByteArray};
 
-builtin bytearray
-axiom ByteArray : Type;
+module Internal;
 
-builtin bytearray-from-list-byte
-axiom mk : List Byte -> ByteArray;
+  --- For input n, returns 2^n
+  pow2 : Nat -> Nat
+    | zero := 1
+    | (suc n) := foldl {_} {Nat} {{_}} \ {acc _ := 2 * acc} 1 (0 to n);
 
-builtin bytearray-length
-axiom length : ByteArray -> Nat;
+  --- The size of a byte in bits
+  byteSize : Nat := 8;
 
-syntax alias AnomaContents := Nat;
+end;
 
-builtin anoma-bytearray-to-anoma-contents
-axiom toAnomaContents : ByteArray -> AnomaContents;
+syntax operator <> cons;
 
-builtin anoma-bytearray-from-anoma-contents
-axiom fromAnomaContents : Nat -> AnomaContents -> ByteArray;
+--- Concatenate two ;ByteArray;s.
+<> (ba1 ba2 : ByteArray) : ByteArray :=
+  let
+    ba1Size := ByteArray.length ba1;
+    ba2Size := ByteArray.length ba2;
+    ba1Content := ByteArray.toAnomaContents ba1;
+    ba2Content := ByteArray.toAnomaContents ba2;
+  in ByteArray.fromAnomaContents
+    (ba1Size + ba2Size)
+    (ba2Content * Internal.pow2 (Internal.byteSize * ba1Size) + ba1Content);
+
+--- Unpack a ;ByteArray; to a list of ;Byte;s.
+toListByte (ba : ByteArray) : List Byte :=
+  let
+    byteMax := Internal.pow2 Internal.byteSize;
+    go (contents : Nat) : Nat -> List Byte
+      | zero := []
+      | (suc n) := Byte.fromNat (mod contents byteMax) :: go (div contents byteMax) n;
+  in go (ByteArray.toAnomaContents ba) (ByteArray.length ba);
+
+empty : ByteArray := ByteArray.mk [];
+
+singleton (b : Byte) : ByteArray := ByteArray.mk [b];
+
+instance
+ByteArrayOrdI : Ord ByteArray := mkOrd (Ord.cmp on toListByte);
+
+instance
+ByteArrayEqI : Eq ByteArray := fromOrdToEq;
+
+open ByteArray public;
