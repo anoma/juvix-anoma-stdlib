@@ -92,6 +92,8 @@ module Resource;
       rseed
     };
 
+  npk : Resource -> PublicKey := npkContents >> fromAtom;
+
 end;
 
 open Resource using {Resource} public;
