@@ -21,4 +21,4 @@ jobs:
           cache: enable
 
       - name: Run tests
-        run: juvix eval test/Main.juvix
+        run: make -C test

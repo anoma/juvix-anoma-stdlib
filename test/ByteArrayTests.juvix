@@ -1,0 +1,27 @@
+module ByteArrayTests;
+
+import Stdlib.Prelude open;
+import Anoma.Data.ByteArray as ByteArray open using {ByteArray; <>};
+
+import Test.QuickCheck.Arbitrary as Arbitrary open using {Arbitrary; mkArbitrary; runArb};
+import Test.QuickCheck.Gen open using {mkGen};
+import Test.QuickCheckTest as QC;
+
+instance
+ByteArbitraryI : Arbitrary Byte := runArb >> Byte.fromNat |> mkGen |> mkArbitrary;
+
+mkToListByteId : QC.Test :=
+  QC.mkTest
+    "mk composed with toListByte is identity"
+    \ {bs := (ByteArray.mk bs |> ByteArray.toListByte) == bs};
+
+concatToListByte : QC.Test :=
+  QC.mkTest
+    "concat of two ByteArrays is concat of bytes"
+    \ {bs1 bs2 :=
+      let
+        ba1 := ByteArray.mk bs1;
+        ba2 := ByteArray.mk bs2;
+      in ByteArray.toListByte (ba1 <> ba2) == (bs1 ++ bs2)};
+
+allTests : List QC.Test := [mkToListByteId; concatToListByte];

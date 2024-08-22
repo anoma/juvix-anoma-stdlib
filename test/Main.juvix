@@ -3,7 +3,10 @@ module Main;
 import Stdlib.Prelude open;
 import Test.JuvixUnit open;
 import AlwaysValid.Tests as AlwaysValid;
+import ByteArrayTests as BT;
 import Resource.Tests as Resource;
+import Test.QuickCheckTest as QC;
 
 main : IO :=
-  runTestSuite (testSuite "Juvix Anoma Stdlib tests" (AlwaysValid.tests ++ Resource.tests));
+  runTestSuite (testSuite "Juvix Anoma Stdlib tests" (AlwaysValid.tests ++ Resource.tests))
+    >>> readLn \ {seed := QC.runTestsIO 100 (stringToNat seed) BT.allTests};
