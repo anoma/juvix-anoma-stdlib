@@ -1,8 +1,8 @@
 module Specs;
 
-import Stdlib.Prelude open using {Bool; Pair; Maybe; Ord; Ordering; mkOrd; Eq; mkEq; ==; for; ||};
+import Stdlib.Prelude open public;
 import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
-import Data.Set as Set open using {Set; member?};
+import Data.Set as Set open public;
 import Data.Map as Map open using {Map};
 
 module MathematicalProperty;
@@ -15,11 +15,9 @@ module MathematicalProperty;
 
   trait
   type KindDistinct T := mkKindDistinct {add : T -> T -> T};
-
 end;
 
 module Delta;
-  -- TODO put this at the right place.
   axiom Delta : Type;
 
   axiom addDelta : Delta -> Delta -> Delta;
@@ -135,15 +133,16 @@ module Resource;
 
   open Nullifier using {Nullifier; nullifier} public;
 
-  axiom CustomInstance : Type;
+  Logic : Type := Tag -> Instance -> Witness -> Bool;
 
-  axiom CustomWitness : Type;
+  axiom logicRef : Logic -> LogicRef;
 
+  --- The reference to the ;Resource; carrying the ;Logic; function.
   type Tag :=
     | Created Commitment
     | Consumed Nullifier;
 
-  {-a.k.a. PublicInputs -}
+  --- The public inputs to the ;Logic; function.
   type Instance :=
     mkInstance {
       commitments : Set Commitment;
@@ -152,7 +151,9 @@ module Resource;
       custom : CustomInstance
     };
 
-  {- a.k.a. PrivateInputs -}
+  axiom CustomInstance : Type;
+
+  --- The private inputs to the ;Logic; function.
   type Witness :=
     mkWitness {
       created : Set Resource;
@@ -160,9 +161,8 @@ module Resource;
       custom : CustomWitness
     };
 
-  Logic : Type := Instance -> Witness -> Bool;
+  axiom CustomWitness : Type;
 
-  axiom logicRef : Logic -> LogicRef;
 end;
 
 open Resource using {Resource} public;
@@ -210,12 +210,11 @@ module ProvingSystem;
 end;
 
 module Transaction;
-  axiom ExtraKeyType : Type;
+  axiom AppDataKeyType : Type;
 
-  axiom ExtraValueType : Type;
+  axiom AppDataValueType : Type;
 
-  -- AppDataMap
-  ExtraMap : Type := Set (Pair ExtraKeyType ExtraValueType);
+  AppDataMap : Type := Set (Pair AppDataKeyType AppDataValueType);
 
   module Action;
     type Action :=
@@ -223,30 +222,32 @@ module Transaction;
         commitments : Set Resource.Commitment;
         nullifiers : Set Resource.Nullifier;
         proofs : Set ProvingSystem.ProofRecord;
-        extra : ExtraMap
+        appData : AppDataMap
       };
   end;
 
+  open Action using {Action} public;
+
   axiom UnitInterval : Type;
+
+  Preference : Type := Transaction -> UnitInterval;
 
   positive
   type Transaction :=
     mkTransaction {
       roots : Set CommitmentTree.Root;
-      commitments : Set Resource.Commitment;
-      nullifiers : Set Resource.Nullifier;
-      proofs : Set ProvingSystem.ProofRecord;
+      actions : Set Action;
       delta : Delta;
-      extra : ExtraMap;
-      preference : Transaction -> UnitInterval
+      preference : Preference
     };
 
   module Delta;
-    -- TODO could be implemented already
     isInCommitmentSet (resource : Resource) (transaction : Transaction) : Bool :=
       let
+        actions : List Action := Set.toList (Transaction.actions transaction);
         cm : Resource.Commitment := Resource.commitment resource;
-        cms : Set Resource.Commitment := Transaction.commitments transaction;
+        cms : Set Resource.Commitment :=
+          for (acc := Set.empty) (a in actions) {union acc (Action.Action.commitments a)};
       in member? cm cms;
 
     isInNullifierSet
@@ -255,12 +256,15 @@ module Transaction;
       (transaction : Transaction)
       : Bool :=
       let
+        actions : Set Action := Transaction.actions transaction;
         nf : Resource.Nullifier :=
           Resource.nullifier@{
             resource;
             nullifierKey
           };
-        nfs : Set Resource.Nullifier := Transaction.nullifiers transaction;
+        nfs : Set Resource.Nullifier :=
+          for (acc := Set.empty) (a in actions) {union acc (Action.Action.nullifiers a)};
+
       in member? nf nfs;
 
     delta
@@ -283,29 +287,23 @@ module Transaction;
   end;
 end;
 
--- TODO: Computable compenents
+open Transaction using {Transaction} public;
 
+-- TODO Continue here
+{-
 module Machine;
-  open Resource;
-  open Transaction;
-
-  axiom StateUpdate : Type;
-
   trait
   type Machine :=
     mkMachine {
       create : Set CommitmentTree.Root
-        -> Set Resource.Commitment
-        -> Set Resource.Nullifier
-        -> Set ProvingSystem.ProofRecord
+        -> Set Transaction.Action
         -> Delta
-        -> ExtraMap
-        -> (Transaction -> UnitInterval)
+        -> Transaction.Preference
         -> Transaction;
       compose : Transaction -> Transaction -> Transaction;
       verify : Transaction.Transaction -> Bool
-    -- StateUpdate -- TODO ask Yulia;
+
     };
 end;
-
 open Machine using {Machine} public;
+-}
