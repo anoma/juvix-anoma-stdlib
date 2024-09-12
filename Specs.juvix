@@ -1,0 +1,311 @@
+module Specs;
+
+import Stdlib.Prelude open using {Bool; Pair; Maybe; Ord; Ordering; mkOrd; Eq; mkEq; ==; for; ||};
+import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
+import Data.Set as Set open using {Set; member?};
+import Data.Map as Map open using {Map};
+
+module MathematicalProperty;
+  trait
+  type AdditivelyHomomorphic T := mkAdditivelyHomomorphic {add : T -> T -> T};
+
+  Property-AdditivelyHomomorphic
+    {T} {{Eq T}} {{AdditivelyHomomorphic T}} (f : T -> T) (x y : T) : Bool :=
+    f (AdditivelyHomomorphic.add x y) == AdditivelyHomomorphic.add (f x) (f y);
+
+  trait
+  type KindDistinct T := mkKindDistinct {add : T -> T -> T};
+
+end;
+
+module Delta;
+  -- TODO put this at the right place.
+  axiom Delta : Type;
+
+  axiom addDelta : Delta -> Delta -> Delta;
+
+  axiom zero : Delta;
+
+  instance
+  Delta-AdditivelyHomomorphic : MathematicalProperty.AdditivelyHomomorphic Delta :=
+    MathematicalProperty.mkAdditivelyHomomorphic@{
+      add (a b : Delta) : Delta := addDelta a b
+    };
+
+  instance
+  Delta-KindDistinct : MathematicalProperty.KindDistinct Delta :=
+    MathematicalProperty.mkKindDistinct@{
+      add (a b : Delta) : Delta := addDelta a b
+    };
+end;
+
+open Delta using {Delta} public;
+
+module Resource;
+
+  axiom LogicRef : Type;
+
+  axiom LabelRef : Type;
+
+  axiom ValueRef : Type;
+
+  axiom Quantity : Type;
+
+  axiom NullifierKey : Type;
+
+  axiom NullifierKeyCommitment : Type;
+
+  axiom Nonce : Type;
+
+  axiom RandSeed : Type;
+
+  type Resource :=
+    mkResource {
+      logicRef : LogicRef;
+      labelRef : LabelRef;
+      valueRef : ValueRef;
+      quantity : Quantity;
+      ephemerality : Bool;
+      nullifierKeyCommitment : NullifierKeyCommitment;
+      nonce : Nonce;
+      randSeed : RandSeed
+    };
+
+  module Kind;
+    axiom Kind : Type;
+
+    open Resource;
+
+    axiom _kind : (logicRef : LogicRef) -> (labelRef : LabelRef) -> Kind;
+
+    kind (resource : Resource) : Kind :=
+      _kind@{
+        logicRef := Resource.logicRef resource;
+        labelRef := Resource.labelRef resource
+      };
+  end;
+
+  open Kind using {Kind; kind} public;
+
+  module Delta;
+    axiom _delta : (kind : Kind) -> (quantity : Quantity) -> Delta;
+
+    delta (resource : Resource) : Delta := _delta (kind resource) (Resource.quantity resource);
+  {- @{ kind := kind resource; quantity := Resource.quantity resource}; -}
+  end;
+
+  open Delta using {delta} public;
+
+  module Commitment;
+    axiom Commitment : Type;
+
+    axiom commitment : (resource : Resource) -> Commitment;
+
+    axiom compare : Commitment -> Commitment -> Ordering;
+
+    instance
+    Commitment-Ord : Ord Commitment :=
+      mkOrd@{
+        cmp := compare
+      };
+
+    instance
+    Commitment-Eq : Eq Commitment := fromOrdToEq;
+
+  end;
+
+  open Commitment using {Commitment; commitment} public;
+
+  module Nullifier;
+    axiom Nullifier : Type;
+
+    axiom nullifier : (resource : Resource) -> (nullifierKey : NullifierKey) -> Nullifier;
+
+    axiom compare : Nullifier -> Nullifier -> Ordering;
+
+    instance
+    Nullifier-Ord : Ord Nullifier :=
+      mkOrd@{
+        cmp := compare
+      };
+
+    instance
+    Nullifier-Eq : Eq Nullifier := fromOrdToEq;
+  end;
+
+  open Nullifier using {Nullifier; nullifier} public;
+
+  axiom CustomInstance : Type;
+
+  axiom CustomWitness : Type;
+
+  type Tag :=
+    | Created Commitment
+    | Consumed Nullifier;
+
+  {-a.k.a. PublicInputs -}
+  type Instance :=
+    mkInstance {
+      commitments : Set Commitment;
+      nullifiers : Set Nullifier;
+      tag : Tag;
+      custom : CustomInstance
+    };
+
+  {- a.k.a. PrivateInputs -}
+  type Witness :=
+    mkWitness {
+      created : Set Resource;
+      consumed : Set Resource;
+      custom : CustomWitness
+    };
+
+  Logic : Type := Instance -> Witness -> Bool;
+
+  axiom logicRef : Logic -> LogicRef;
+end;
+
+open Resource using {Resource} public;
+
+module CommitmentTree;
+  axiom Root : Type;
+
+  axiom Path : Type;
+
+  positive
+  trait
+  type CommitmentTree :=
+    mkCommitmentTree {
+      add : CommitmentTree -> Resource.Commitment -> Path;
+      path : CommitmentTree -> Resource.Commitment -> Maybe Path;
+      verify : Resource.Commitment -> Path -> Root -> Bool;
+      root : CommitmentTree -> Root
+    };
+end;
+
+module NullfifierSet;
+  trait
+  type NullfifierSet :=
+    mkAccumulator {
+      add : Resource.Nullifier -> NullfifierSet;
+      exists : Resource.Nullifier -> Bool
+    };
+end;
+
+module ProvingSystem;
+  axiom Proof : Type;
+
+  axiom VerifyingKey : Type;
+
+  axiom ProvingKey : Type;
+
+  ProofRecord : Type := Pair VerifyingKey (Pair Proof Resource.Witness);
+
+  trait
+  type ProvingSystem :=
+    mkProvingSystem {
+      prove : ProvingKey -> Resource.Instance -> Resource.Witness -> Proof;
+      verify : ProofRecord -> Bool
+    };
+end;
+
+module Transaction;
+  axiom ExtraKeyType : Type;
+
+  axiom ExtraValueType : Type;
+
+  -- AppDataMap
+  ExtraMap : Type := Set (Pair ExtraKeyType ExtraValueType);
+
+  module Action;
+    type Action :=
+      mkAction {
+        commitments : Set Resource.Commitment;
+        nullifiers : Set Resource.Nullifier;
+        proofs : Set ProvingSystem.ProofRecord;
+        extra : ExtraMap
+      };
+  end;
+
+  axiom UnitInterval : Type;
+
+  positive
+  type Transaction :=
+    mkTransaction {
+      roots : Set CommitmentTree.Root;
+      commitments : Set Resource.Commitment;
+      nullifiers : Set Resource.Nullifier;
+      proofs : Set ProvingSystem.ProofRecord;
+      delta : Delta;
+      extra : ExtraMap;
+      preference : Transaction -> UnitInterval
+    };
+
+  module Delta;
+    -- TODO could be implemented already
+    isInCommitmentSet (resource : Resource) (transaction : Transaction) : Bool :=
+      let
+        cm : Resource.Commitment := Resource.commitment resource;
+        cms : Set Resource.Commitment := Transaction.commitments transaction;
+      in member? cm cms;
+
+    isInNullifierSet
+      (resource : Resource)
+      (nullifierKey : Resource.NullifierKey)
+      (transaction : Transaction)
+      : Bool :=
+      let
+        nf : Resource.Nullifier :=
+          Resource.nullifier@{
+            resource;
+            nullifierKey
+          };
+        nfs : Set Resource.Nullifier := Transaction.nullifiers transaction;
+      in member? nf nfs;
+
+    delta
+      (resources : Set Resource)
+      (nullifierKey : Resource.NullifierKey)
+      (transaction : Transaction)
+      : Delta :=
+      for (acc := Delta.zero) (r in resources)
+        {if
+          | isInCommitmentSet@{
+              resource := r;
+              transaction
+            }
+            || isInNullifierSet@{
+              resource := r;
+              nullifierKey;
+              transaction
+            } := MathematicalProperty.AdditivelyHomomorphic.add acc (Resource.delta r)
+          | else := acc};
+  end;
+end;
+
+-- TODO: Computable compenents
+
+module Machine;
+  open Resource;
+  open Transaction;
+
+  axiom StateUpdate : Type;
+
+  trait
+  type Machine :=
+    mkMachine {
+      create : Set CommitmentTree.Root
+        -> Set Resource.Commitment
+        -> Set Resource.Nullifier
+        -> Set ProvingSystem.ProofRecord
+        -> Delta
+        -> ExtraMap
+        -> (Transaction -> UnitInterval)
+        -> Transaction;
+      compose : Transaction -> Transaction -> Transaction;
+      verify : Transaction.Transaction -> Bool
+    -- StateUpdate -- TODO ask Yulia;
+    };
+end;
+
+open Machine using {Machine} public;
