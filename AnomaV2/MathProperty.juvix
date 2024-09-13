@@ -1,0 +1,13 @@
+module AnomaV2.MathProperty;
+
+import Stdlib.Prelude open;
+
+trait
+type AdditivelyHomomorphic T := mkAdditivelyHomomorphic {add : T -> T -> T};
+
+Property-AdditivelyHomomorphic
+  {T} {{Eq T}} {{AdditivelyHomomorphic T}} (f : T -> T) (x y : T) : Bool :=
+  f (AdditivelyHomomorphic.add x y) == AdditivelyHomomorphic.add (f x) (f y);
+
+trait
+type KindDistinct T := mkKindDistinct {add : T -> T -> T};

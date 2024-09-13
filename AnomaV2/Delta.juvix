@@ -1,0 +1,22 @@
+module AnomaV2.Delta;
+
+import Stdlib.Prelude open;
+import AnomaV2.MathProperty as MathProperty open;
+
+axiom Delta : Type;
+
+axiom addDelta : Delta -> Delta -> Delta;
+
+axiom zero : Delta;
+
+instance
+Delta-AdditivelyHomomorphic : MathProperty.AdditivelyHomomorphic Delta :=
+  MathProperty.mkAdditivelyHomomorphic@{
+    add (a b : Delta) : Delta := addDelta a b
+  };
+
+instance
+Delta-KindDistinct : MathProperty.KindDistinct Delta :=
+  MathProperty.mkKindDistinct@{
+    add (a b : Delta) : Delta := addDelta a b
+  };

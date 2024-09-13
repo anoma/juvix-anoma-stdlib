@@ -1,46 +1,14 @@
 module AnomaV2.Specs;
 
-import Stdlib.Prelude open public;
+import Stdlib.Prelude open;
 import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
-import Data.Set as Set open public;
+import Data.Set as Set open;
 import Data.Map as Map open using {Map};
 
-module MathematicalProperty;
-  trait
-  type AdditivelyHomomorphic T := mkAdditivelyHomomorphic {add : T -> T -> T};
-
-  Property-AdditivelyHomomorphic
-    {T} {{Eq T}} {{AdditivelyHomomorphic T}} (f : T -> T) (x y : T) : Bool :=
-    f (AdditivelyHomomorphic.add x y) == AdditivelyHomomorphic.add (f x) (f y);
-
-  trait
-  type KindDistinct T := mkKindDistinct {add : T -> T -> T};
-end;
-
-module Delta;
-  axiom Delta : Type;
-
-  axiom addDelta : Delta -> Delta -> Delta;
-
-  axiom zero : Delta;
-
-  instance
-  Delta-AdditivelyHomomorphic : MathematicalProperty.AdditivelyHomomorphic Delta :=
-    MathematicalProperty.mkAdditivelyHomomorphic@{
-      add (a b : Delta) : Delta := addDelta a b
-    };
-
-  instance
-  Delta-KindDistinct : MathematicalProperty.KindDistinct Delta :=
-    MathematicalProperty.mkKindDistinct@{
-      add (a b : Delta) : Delta := addDelta a b
-    };
-end;
-
-open Delta using {Delta} public;
+import AnomaV2.MathProperty as MathProperty open;
+import AnomaV2.Delta as Delta open using {Delta};
 
 module Resource;
-
   axiom LogicRef : Type;
 
   axiom Label : Type;
@@ -89,14 +57,19 @@ module Resource;
 
   open Kind using {Kind; kind} public;
 
-  module Delta;
+  module ResourceDelta;
     axiom _delta : (kind : Kind) -> (quantity : Quantity) -> Delta;
 
     delta (resource : Resource) : Delta := _delta (kind resource) (Resource.quantity resource);
   {- @{ kind := kind resource; quantity := Resource.quantity resource}; -}
   end;
 
-  open Delta using {delta} public;
+  open ResourceDelta using {delta} public;
+
+  -- This is a workaround.
+  module Delta;
+    open ResourceDelta public;
+  end;
 
   module Commitment;
     axiom Commitment : Type;
@@ -113,7 +86,6 @@ module Resource;
 
     instance
     Commitment-Eq : Eq Commitment := fromOrdToEq;
-
   end;
 
   open Commitment using {Commitment; commitment} public;
@@ -290,7 +262,7 @@ module Transaction;
               resource := r;
               nullifierKey;
               transaction
-            } := MathematicalProperty.AdditivelyHomomorphic.add acc (Resource.delta r)
+            } := MathProperty.AdditivelyHomomorphic.add acc (Resource.delta r)
           | else := acc};
   end;
 end;
