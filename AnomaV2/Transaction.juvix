@@ -1,0 +1,72 @@
+module AnomaV2.Transaction;
+
+import Stdlib.Prelude open;
+import Data.Set as Set open;
+import AnomaV2.Delta as Delta;
+import AnomaV2.Resource as Resource;
+import AnomaV2.CommitmentTree as CommitmentTree;
+import AnomaV2.ProvingSystem as ProvingSystem;
+import AnomaV2.MathProperty as MathProperty;
+import AnomaV2.Action as Action;
+
+open Delta using {Delta};
+open Resource using {Resource};
+open Action using {Action};
+
+axiom UnitInterval : Type;
+
+Preference : Type := Transaction -> UnitInterval;
+
+positive
+type Transaction :=
+  mkTransaction {
+    roots : Set CommitmentTree.Root;
+    actions : Set Action;
+    delta : Delta;
+    preference : Preference
+  };
+
+module TransactionDelta;
+  isInCommitmentSet (resource : Resource) (transaction : Transaction) : Bool :=
+    let
+      actions : List Action := Set.toList (Transaction.actions transaction);
+      cm : Resource.Commitment := Resource.commitment resource;
+      cms : Set Resource.Commitment :=
+        for (acc := Set.empty) (a in actions) {union acc (Action.Action.commitments a)};
+    in member? cm cms;
+
+  isInNullifierSet
+    (resource : Resource)
+    (nullifierKey : Resource.NullifierKey)
+    (transaction : Transaction)
+    : Bool :=
+    let
+      actions : Set Action := Transaction.actions transaction;
+      nf : Resource.Nullifier :=
+        Resource.nullifier@{
+          resource;
+          nullifierKey
+        };
+      nfs : Set Resource.Nullifier :=
+        for (acc := Set.empty) (a in actions) {union acc (Action.Action.nullifiers a)};
+
+    in member? nf nfs;
+
+  delta
+    (resources : Set Resource)
+    (nullifierKey : Resource.NullifierKey)
+    (transaction : Transaction)
+    : Delta :=
+    for (acc := Delta.zero) (r in resources)
+      {if
+        | isInCommitmentSet@{
+            resource := r;
+            transaction
+          }
+          || isInNullifierSet@{
+            resource := r;
+            nullifierKey;
+            transaction
+          } := MathProperty.AdditivelyHomomorphic.add acc (Resource.delta r)
+        | else := acc};
+end;

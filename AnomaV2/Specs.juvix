@@ -5,90 +5,12 @@ import Data.Set as Set open;
 import Data.Map as Map open using {Map};
 import AnomaV2.MathProperty as MathProperty;
 import AnomaV2.Delta as Delta open using {Delta};
-import AnomaV2.Resource as Resource open using {Resource} public;
 import AnomaV2.CommitmentTree as CommitmentTree;
 import AnomaV2.NullifierSet as NullifierSet;
 import AnomaV2.ProvingSystem as ProvingSystem;
 
-module Transaction;
-  axiom AppDataKeyType : Type;
-
-  axiom AppDataValueType : Type;
-
-  AppDataMap : Type := Set (Pair AppDataKeyType AppDataValueType);
-
-  module Action;
-    type Action :=
-      mkAction {
-        commitments : Set Resource.Commitment;
-        nullifiers : Set Resource.Nullifier;
-        proofs : Set ProvingSystem.ProofRecord;
-        appData : AppDataMap
-      };
-  end;
-
-  open Action using {Action} public;
-
-  axiom UnitInterval : Type;
-
-  Preference : Type := Transaction -> UnitInterval;
-
-  positive
-  type Transaction :=
-    mkTransaction {
-      roots : Set CommitmentTree.Root;
-      actions : Set Action;
-      delta : Delta;
-      preference : Preference
-    };
-
-  module Delta;
-    isInCommitmentSet (resource : Resource) (transaction : Transaction) : Bool :=
-      let
-        actions : List Action := Set.toList (Transaction.actions transaction);
-        cm : Resource.Commitment := Resource.commitment resource;
-        cms : Set Resource.Commitment :=
-          for (acc := Set.empty) (a in actions) {union acc (Action.Action.commitments a)};
-      in member? cm cms;
-
-    isInNullifierSet
-      (resource : Resource)
-      (nullifierKey : Resource.NullifierKey)
-      (transaction : Transaction)
-      : Bool :=
-      let
-        actions : Set Action := Transaction.actions transaction;
-        nf : Resource.Nullifier :=
-          Resource.nullifier@{
-            resource;
-            nullifierKey
-          };
-        nfs : Set Resource.Nullifier :=
-          for (acc := Set.empty) (a in actions) {union acc (Action.Action.nullifiers a)};
-
-      in member? nf nfs;
-
-    delta
-      (resources : Set Resource)
-      (nullifierKey : Resource.NullifierKey)
-      (transaction : Transaction)
-      : Delta :=
-      for (acc := Delta.zero) (r in resources)
-        {if
-          | isInCommitmentSet@{
-              resource := r;
-              transaction
-            }
-            || isInNullifierSet@{
-              resource := r;
-              nullifierKey;
-              transaction
-            } := MathProperty.AdditivelyHomomorphic.add acc (Resource.delta r)
-          | else := acc};
-  end;
-end;
-
-open Transaction using {Transaction} public;
+import AnomaV2.Resource as Resource open using {Resource};
+import AnomaV2.Transaction as Transaction open using {Transaction};
 
 -- TODO Continue here
 {-

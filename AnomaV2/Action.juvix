@@ -1,0 +1,20 @@
+module AnomaV2.Action;
+
+import Stdlib.Prelude open;
+import Data.Set as Set open;
+import AnomaV2.Resource as Resource;
+import AnomaV2.ProvingSystem as ProvingSystem;
+
+axiom AppDataKeyType : Type;
+
+axiom AppDataValueType : Type;
+
+AppDataMap : Type := Set (Pair AppDataKeyType AppDataValueType);
+
+type Action :=
+  mkAction {
+    commitments : Set Resource.Commitment;
+    nullifiers : Set Resource.Nullifier;
+    proofs : Set ProvingSystem.ProofRecord;
+    appData : AppDataMap
+  };
