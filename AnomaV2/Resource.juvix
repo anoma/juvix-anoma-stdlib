@@ -1,0 +1,142 @@
+module AnomaV2.Resource;
+
+import Stdlib.Prelude open;
+import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
+import Data.Set as Set open;
+
+import AnomaV2.MathProperty as MathProperty open;
+import AnomaV2.Delta as Delta open;
+
+axiom LogicRef : Type;
+
+axiom Label : Type;
+
+axiom LabelRef : Type;
+
+axiom Value : Type;
+
+axiom ValueRef : Type;
+
+axiom Quantity : Type;
+
+axiom NullifierKey : Type;
+
+axiom NullifierKeyCommitment : Type;
+
+axiom Nonce : Type;
+
+axiom RandSeed : Type;
+
+type Resource :=
+  mkResource {
+    logicRef : LogicRef;
+    labelRef : LabelRef;
+    valueRef : ValueRef;
+    quantity : Quantity;
+    ephemerality : Bool;
+    nullifierKeyCommitment : NullifierKeyCommitment;
+    nonce : Nonce;
+    randSeed : RandSeed
+  };
+
+module Kind;
+  axiom Kind : Type;
+
+  open Resource;
+
+  axiom _kind : (logicRef : LogicRef) -> (labelRef : LabelRef) -> Kind;
+
+  kind (resource : Resource) : Kind :=
+    _kind@{
+      logicRef := Resource.logicRef resource;
+      labelRef := Resource.labelRef resource
+    };
+end;
+
+open Kind using {Kind; kind} public;
+
+module ResourceDelta;
+  axiom _delta : (kind : Kind) -> (quantity : Quantity) -> Delta;
+
+  delta (resource : Resource) : Delta := _delta (kind resource) (Resource.quantity resource);
+{- @{ kind := kind resource; quantity := Resource.quantity resource}; -}
+end;
+
+open ResourceDelta using {delta} public;
+
+-- This is a workaround.
+module Delta;
+  open ResourceDelta public;
+end;
+
+module Commitment;
+  axiom Commitment : Type;
+
+  axiom commitment : (resource : Resource) -> Commitment;
+
+  axiom compare : Commitment -> Commitment -> Ordering;
+
+  instance
+  Commitment-Ord : Ord Commitment :=
+    mkOrd@{
+      cmp := compare
+    };
+
+  instance
+  Commitment-Eq : Eq Commitment := fromOrdToEq;
+end;
+
+open Commitment using {Commitment; commitment} public;
+
+module Nullifier;
+  axiom Nullifier : Type;
+
+  axiom nullifier : (resource : Resource) -> (nullifierKey : NullifierKey) -> Nullifier;
+
+  axiom compare : Nullifier -> Nullifier -> Ordering;
+
+  instance
+  Nullifier-Ord : Ord Nullifier :=
+    mkOrd@{
+      cmp := compare
+    };
+
+  instance
+  Nullifier-Eq : Eq Nullifier := fromOrdToEq;
+end;
+
+open Nullifier using {Nullifier; nullifier} public;
+
+Logic : Type := Tag -> Instance -> Witness -> Bool;
+
+axiom logicRef : Logic -> LogicRef;
+
+axiom labelRef : Label -> LabelRef;
+
+axiom valueRef : Value -> ValueRef;
+
+--- The reference to the ;Resource; carrying the ;Logic; function.
+type Tag :=
+  | Created Commitment
+  | Consumed Nullifier;
+
+--- The public inputs to the ;Logic; function.
+type Instance :=
+  mkInstance {
+    commitments : Set Commitment;
+    nullifiers : Set Nullifier;
+    tag : Tag;
+    custom : CustomInstance
+  };
+
+axiom CustomInstance : Type;
+
+--- The private inputs to the ;Logic; function.
+type Witness :=
+  mkWitness {
+    created : Set Resource;
+    consumed : Set Resource;
+    custom : CustomWitness
+  };
+
+axiom CustomWitness : Type;
