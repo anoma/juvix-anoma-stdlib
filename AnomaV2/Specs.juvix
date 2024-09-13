@@ -1,23 +1,13 @@
 module AnomaV2.Specs;
 
 import Stdlib.Prelude open;
-
 import Data.Set as Set open;
 import Data.Map as Map open using {Map};
-
 import AnomaV2.MathProperty as MathProperty;
 import AnomaV2.Delta as Delta open using {Delta};
 import AnomaV2.Resource as Resource open using {Resource} public;
 import AnomaV2.CommitmentTree as CommitmentTree;
-
-module NullfifierSet;
-  trait
-  type NullfifierSet :=
-    mkAccumulator {
-      add : Resource.Nullifier -> NullfifierSet;
-      exists : Resource.Nullifier -> Bool
-    };
-end;
+import AnomaV2.NullifierSet as NullifierSet;
 
 module ProvingSystem;
   axiom Proof : Type;
