@@ -1,4 +1,4 @@
-module Specs;
+module AnomaV2.Specs;
 
 import Stdlib.Prelude open public;
 import Stdlib.Trait.Ord.Eq open using {fromOrdToEq};
