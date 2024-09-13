@@ -5,25 +5,10 @@ import Stdlib.Prelude open;
 import Data.Set as Set open;
 import Data.Map as Map open using {Map};
 
-import AnomaV2.MathProperty as MathProperty open;
+import AnomaV2.MathProperty as MathProperty;
 import AnomaV2.Delta as Delta open using {Delta};
 import AnomaV2.Resource as Resource open using {Resource} public;
-
-module CommitmentTree;
-  axiom Root : Type;
-
-  axiom Path : Type;
-
-  positive
-  trait
-  type CommitmentTree :=
-    mkCommitmentTree {
-      add : CommitmentTree -> Resource.Commitment -> Path;
-      path : CommitmentTree -> Resource.Commitment -> Maybe Path;
-      verify : Resource.Commitment -> Path -> Root -> Bool;
-      root : CommitmentTree -> Root
-    };
-end;
+import AnomaV2.CommitmentTree as CommitmentTree;
 
 module NullfifierSet;
   trait

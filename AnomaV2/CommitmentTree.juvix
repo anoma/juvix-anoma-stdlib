@@ -1,0 +1,18 @@
+module AnomaV2.CommitmentTree;
+
+import Stdlib.Prelude open;
+import AnomaV2.Resource as Resource;
+
+axiom Root : Type;
+
+axiom Path : Type;
+
+positive
+trait
+type CommitmentTree :=
+  mkCommitmentTree {
+    add : CommitmentTree -> Resource.Commitment -> Path;
+    path : CommitmentTree -> Resource.Commitment -> Maybe Path;
+    verify : Resource.Commitment -> Path -> Root -> Bool;
+    root : CommitmentTree -> Root
+  };
