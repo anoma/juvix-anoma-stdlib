@@ -43,7 +43,11 @@ module Resource;
 
   axiom LogicRef : Type;
 
+  axiom Label : Type;
+
   axiom LabelRef : Type;
+
+  axiom Value : Type;
 
   axiom ValueRef : Type;
 
@@ -136,6 +140,10 @@ module Resource;
   Logic : Type := Tag -> Instance -> Witness -> Bool;
 
   axiom logicRef : Logic -> LogicRef;
+
+  axiom labelRef : Label -> LabelRef;
+
+  axiom valueRef : Value -> ValueRef;
 
   --- The reference to the ;Resource; carrying the ;Logic; function.
   type Tag :=
