@@ -8,23 +8,7 @@ import AnomaV2.Delta as Delta open using {Delta};
 import AnomaV2.Resource as Resource open using {Resource} public;
 import AnomaV2.CommitmentTree as CommitmentTree;
 import AnomaV2.NullifierSet as NullifierSet;
-
-module ProvingSystem;
-  axiom Proof : Type;
-
-  axiom VerifyingKey : Type;
-
-  axiom ProvingKey : Type;
-
-  ProofRecord : Type := Pair VerifyingKey (Pair Proof Resource.Witness);
-
-  trait
-  type ProvingSystem :=
-    mkProvingSystem {
-      prove : ProvingKey -> Resource.Instance -> Resource.Witness -> Proof;
-      verify : ProofRecord -> Bool
-    };
-end;
+import AnomaV2.ProvingSystem as ProvingSystem;
 
 module Transaction;
   axiom AppDataKeyType : Type;

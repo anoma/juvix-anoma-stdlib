@@ -1,0 +1,19 @@
+module AnomaV2.ProvingSystem;
+
+import Stdlib.Prelude open;
+import AnomaV2.Resource as Resource;
+
+axiom Proof : Type;
+
+axiom VerifyingKey : Type;
+
+axiom ProvingKey : Type;
+
+ProofRecord : Type := Pair VerifyingKey (Pair Proof Resource.Witness);
+
+trait
+type ProvingSystem :=
+  mkProvingSystem {
+    prove : ProvingKey -> Resource.Instance -> Resource.Witness -> Proof;
+    verify : ProofRecord -> Bool
+  };
