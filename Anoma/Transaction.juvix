@@ -45,6 +45,7 @@ module Helper;
       rseed : Nat
     };
 
+  positive
   type Transaction :=
     mkTransaction {
       roots : List Nat;
